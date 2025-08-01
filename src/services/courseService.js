@@ -10,7 +10,8 @@ import {
     where,
     orderBy,
     onSnapshot,
-    writeBatch
+    writeBatch,
+    setDoc
 } from 'firebase/firestore';
 
 // Course Service for Firebase operations
@@ -145,6 +146,21 @@ export const courseService = {
             }));
         } catch (error) {
             console.error('Error fetching freshers:', error);
+            throw error;
+        }
+    },
+
+    async addFresher(fresherData) {
+        try {
+            const userRef = doc(db, 'users', fresherData.uid);
+            await setDoc(userRef, {
+                ...fresherData,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('Error adding fresher:', error);
             throw error;
         }
     },
@@ -383,4 +399,4 @@ export const courseService = {
     }
 };
 
-export default courseService; 
+export default courseService;

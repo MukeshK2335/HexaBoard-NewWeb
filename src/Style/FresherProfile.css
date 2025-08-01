@@ -77,16 +77,39 @@
 
 /* Responsive tweaks */
 @media (max-width: 768px) {
-    .info-grid {
-        flex-direction: column;
+    .profile-wrapper {
+        padding: 1.5rem;
     }
 
-    .info-box {
-        width: 100%;
+    .profile-card {
+        padding: 1.5rem 2rem;
     }
 
     .profile-title {
-        font-size: 1.75rem;
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-grid {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .info-box {
+        flex: 1 1 100%;
+        padding: 1rem 1.2rem;
+    }
+
+    .info-box p {
+        font-size: 0.95rem;
+    }
+
+    .chart-section {
+        margin-top: 1.5rem;
+    }
+
+    .chart-section h3 {
+        font-size: 1.1rem;
     }
 }
 
@@ -96,11 +119,31 @@
     }
 
     .profile-card {
-        padding: 1.5rem;
+        padding: 1rem 1.2rem;
+    }
+
+    .profile-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-grid {
+        gap: 1rem;
+    }
+
+    .info-box {
+        padding: 0.8rem 1rem;
     }
 
     .info-box p {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+    }
+
+    .chart-section {
+        margin-top: 1rem;
+    }
+
+    .chart-section h3 {
+        font-size: 1rem;
     }
 }
-

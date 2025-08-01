@@ -171,6 +171,17 @@
     .sidebar-menu {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .sidebar-menu li {
+        margin: 5px 0;
+    }
+
+    .sidebar-menu a, .sidebar-link {
+        padding: 8px 12px;
+        font-size: 14px;
     }
 
     .main-content {
@@ -185,5 +196,64 @@
     .fresher-profile-card h2,
     .training-status-section h3 {
         font-size: 1.4rem;
+    }
+
+    .fresher-profile-card p {
+        font-size: 14px;
+    }
+
+    .training-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .status-card p {
+        font-size: 14px;
+    }
+
+    .status-card span {
+        font-size: 13px;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        padding: 10px 5px;
+    }
+
+    .sidebar-menu {
+        gap: 8px;
+    }
+
+    .sidebar-menu a, .sidebar-link {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .fresher-profile-card,
+    .status-card {
+        padding: 15px 18px;
+    }
+
+    .fresher-profile-card h2,
+    .training-status-section h3 {
+        font-size: 1.2rem;
+    }
+
+    .fresher-profile-card p {
+        font-size: 13px;
+    }
+
+    .status-card p {
+        font-size: 13px;
+    }
+
+    .status-card span {
+        font-size: 12px;
+        padding: 4px 8px;
     }
 }

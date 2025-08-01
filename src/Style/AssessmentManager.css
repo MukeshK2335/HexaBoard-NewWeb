@@ -405,4 +405,164 @@
     .question-options {
         grid-template-columns: 1fr;
     }
+
+    .assessment-form {
+        padding: 1.5rem;
+    }
+
+    .assessment-form h3 {
+        font-size: 1.3rem;
+    }
+
+    .questions-section {
+        padding: 1rem;
+    }
+
+    .add-question-form {
+        padding: 1rem;
+    }
+
+    .question-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .save-btn, .cancel-btn {
+        width: 100%;
+    }
+
+    .assessment-card {
+        padding: 1rem;
+    }
+
+    .assessment-header-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .assessment-badges {
+        flex-wrap: wrap;
+    }
+
+    .assessment-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .edit-btn, .delete-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .assessment-manager {
+        padding: 0.5rem;
+    }
+
+    .assessment-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .add-assessment-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .assessment-form {
+        padding: 1rem;
+    }
+
+    .assessment-form h3 {
+        font-size: 1.2rem;
+    }
+
+    .form-grid input,
+    .form-grid select,
+    .assessment-form textarea {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .questions-section {
+        padding: 0.8rem;
+    }
+
+    .add-question-form {
+        padding: 0.8rem;
+    }
+
+    .question-options {
+        gap: 0.5rem;
+    }
+
+    .option-input input[type="text"] {
+        padding: 0.4rem;
+    }
+
+    .question-meta input {
+        padding: 0.4rem;
+    }
+
+    .question-meta button {
+        padding: 0.4rem 0.8rem;
+    }
+
+    .question-item {
+        padding: 0.8rem;
+    }
+
+    .question-header span {
+        font-size: 0.9rem;
+    }
+
+    .remove-question {
+        padding: 0.15rem;
+    }
+
+    .question-options-display span {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .save-btn, .cancel-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .assessment-card {
+        padding: 0.8rem;
+    }
+
+    .assessment-header-info h3 {
+        font-size: 1.1rem;
+    }
+
+    .type-badge, .status-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    .meta-item {
+        font-size: 0.8rem;
+    }
+
+    .edit-btn, .delete-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.2rem;
+    }
 }

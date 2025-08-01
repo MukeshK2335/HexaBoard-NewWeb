@@ -463,35 +463,321 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .my-courses {
+        padding: 15px;
+    }
+
+    .courses-header {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .courses-header h2 {
+        font-size: 24px;
+    }
+
+    .courses-header p {
+        font-size: 15px;
+    }
+
+    .no-courses {
+        padding: 60px 15px;
+    }
+
+    .no-courses-icon {
+        font-size: 50px;
+    }
+
+    .no-courses h3 {
+        font-size: 18px;
+    }
+
+    .no-courses p {
+        font-size: 15px;
+    }
+
     .courses-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
-    
+
+    .course-card {
+        padding: 20px;
+    }
+
+    .course-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .course-status {
+        flex-wrap: wrap;
+    }
+
+    .course-title {
+        font-size: 16px;
+    }
+
+    .course-description {
+        font-size: 13px;
+    }
+
     .course-meta {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
-    
-    .overview-stats {
-        grid-template-columns: repeat(2, 1fr);
+
+    .meta-item {
+        font-size: 11px;
     }
-    
-    .lesson-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+
+    .view-course-btn {
+        padding: 10px 15px;
+        font-size: 14px;
     }
-    
-    .lesson-actions {
-        justify-content: space-between;
-    }
-    
+
     .modal-content {
         width: 95%;
-        margin: 20px;
+        margin: 15px;
     }
-    
+
     .modal-header {
+        padding: 20px;
         flex-direction: column;
-        gap: 16px;
+        gap: 15px;
     }
-} 
+
+    .modal-course-info h3 {
+        font-size: 20px;
+    }
+
+    .modal-subtitle {
+        font-size: 15px;
+    }
+
+    .close-btn {
+        font-size: 20px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .overview-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .stat-item {
+        padding: 12px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+    }
+
+    .course-instructor {
+        padding: 12px;
+    }
+
+    .course-instructor h4 {
+        font-size: 15px;
+    }
+
+    .course-instructor p {
+        font-size: 13px;
+    }
+
+    .course-curriculum h4 {
+        font-size: 18px;
+    }
+
+    .module-item {
+        padding: 15px;
+    }
+
+    .module-header h5 {
+        font-size: 15px;
+    }
+
+    .module-description {
+        font-size: 13px;
+    }
+
+    .lessons-list {
+        gap: 10px;
+    }
+
+    .lesson-item {
+        padding: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .lesson-title {
+        font-size: 13px;
+    }
+
+    .lesson-duration {
+        font-size: 11px;
+    }
+
+    .lesson-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .lesson-status-btn, .watch-video-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .my-courses {
+        padding: 10px;
+    }
+
+    .courses-header {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .courses-header h2 {
+        font-size: 20px;
+    }
+
+    .courses-header p {
+        font-size: 14px;
+    }
+
+    .no-courses {
+        padding: 40px 10px;
+    }
+
+    .no-courses-icon {
+        font-size: 40px;
+    }
+
+    .no-courses h3 {
+        font-size: 16px;
+    }
+
+    .no-courses p {
+        font-size: 14px;
+    }
+
+    .course-card {
+        padding: 15px;
+    }
+
+    .course-title {
+        font-size: 15px;
+    }
+
+    .course-description {
+        font-size: 12px;
+    }
+
+    .view-course-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .modal-content {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-course-info h3 {
+        font-size: 18px;
+    }
+
+    .modal-subtitle {
+        font-size: 14px;
+    }
+
+    .close-btn {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .overview-stats {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-item {
+        padding: 10px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    .stat-value {
+        font-size: 14px;
+    }
+
+    .course-instructor {
+        padding: 10px;
+    }
+
+    .course-instructor h4 {
+        font-size: 14px;
+    }
+
+    .course-instructor p {
+        font-size: 12px;
+    }
+
+    .course-curriculum h4 {
+        font-size: 16px;
+    }
+
+    .module-item {
+        padding: 12px;
+    }
+
+    .module-header h5 {
+        font-size: 14px;
+    }
+
+    .module-description {
+        font-size: 12px;
+    }
+
+    .lessons-list {
+        gap: 8px;
+    }
+
+    .lesson-item {
+        padding: 10px;
+    }
+
+    .lesson-title {
+        font-size: 12px;
+    }
+
+    .lesson-duration {
+        font-size: 10px;
+    }
+
+    .lesson-status-btn, .watch-video-btn {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+}

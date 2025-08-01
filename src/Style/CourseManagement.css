@@ -497,31 +497,274 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .course-management {
+        padding: 15px;
+    }
+
     .course-management-header {
         flex-direction: column;
         gap: 15px;
         align-items: stretch;
+        padding: 15px;
     }
     
+    .course-management-header h2 {
+        font-size: 20px;
+    }
+
+    .assignment-mode-selector {
+        align-items: center;
+    }
+
     .mode-buttons {
+        flex-wrap: wrap;
         justify-content: center;
     }
-    
+
+    .mode-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .selector-section {
+        padding: 15px;
+    }
+
+    .fresher-selector select, .department-selector select {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .add-course-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .course-item {
+        padding: 15px;
+    }
+
     .course-header {
         flex-direction: column;
         gap: 10px;
+        align-items: flex-start;
     }
-    
+
+    .course-header h3 {
+        font-size: 16px;
+    }
+
+    .fresher-name {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
     .course-actions {
+        flex-wrap: wrap;
         justify-content: flex-start;
+        gap: 8px;
     }
-    
-    .form-row {
-        grid-template-columns: 1fr;
+
+    .course-actions select {
+        font-size: 11px;
+        padding: 4px 8px;
     }
-    
+
+    .delete-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .course-details p {
+        font-size: 13px;
+    }
+
+    .module-item {
+        padding: 12px;
+    }
+
+    .module-item h5 {
+        font-size: 13px;
+    }
+
+    .module-item p {
+        font-size: 12px;
+    }
+
+    .lesson-item {
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+
     .modal-content {
         width: 95%;
         margin: 10px;
+        padding: 15px;
     }
-} 
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-header h3 {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .assignment-info {
+        padding: 12px;
+    }
+
+    .assignment-info p {
+        font-size: 13px;
+    }
+
+    .modal-footer {
+        padding: 15px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .add-module-form,
+    .add-lesson-form {
+        padding: 15px;
+    }
+
+    .add-lesson-btn, .add-module-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .cancel-btn, .save-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .course-management {
+        padding: 10px;
+    }
+
+    .course-management-header {
+        padding: 10px;
+    }
+
+    .course-management-header h2 {
+        font-size: 18px;
+    }
+
+    .mode-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .selector-section {
+        padding: 10px;
+    }
+
+    .fresher-selector select, .department-selector select {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .add-course-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .course-item {
+        padding: 10px;
+    }
+
+    .course-header h3 {
+        font-size: 14px;
+    }
+
+    .course-details p {
+        font-size: 12px;
+    }
+
+    .module-item {
+        padding: 10px;
+    }
+
+    .module-item h5 {
+        font-size: 12px;
+    }
+
+    .module-item p {
+        font-size: 11px;
+    }
+
+    .lesson-item {
+        font-size: 10px;
+        padding: 3px 5px;
+    }
+
+    .modal-content {
+        padding: 10px;
+    }
+
+    .modal-header {
+        padding: 10px;
+    }
+
+    .modal-header h3 {
+        font-size: 16px;
+    }
+
+    .modal-body {
+        padding: 10px;
+    }
+
+    .assignment-info {
+        padding: 10px;
+    }
+
+    .assignment-info p {
+        font-size: 12px;
+    }
+
+    .modal-footer {
+        padding: 10px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .add-module-form,
+    .add-lesson-form {
+        padding: 10px;
+    }
+
+    .add-lesson-btn, .add-module-btn {
+        padding: 5px 10px;
+        font-size: 10px;
+    }
+
+    .cancel-btn, .save-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}

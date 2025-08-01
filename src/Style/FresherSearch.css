@@ -99,26 +99,6 @@
     color: #111;
 }
 
-/* Responsive layout */
-@media (max-width: 768px) {
-    .filters,
-    .add-fresher-form {
-        flex-direction: column;
-    }
-
-    .filters input,
-    .filters select,
-    .add-fresher-form input,
-    .add-fresher-form select,
-    .filters button,
-    .add-fresher-form button {
-        width: 100%;
-    }
-
-    .fresher-card {
-        padding: 16px;
-    }
-}
 .view-btn {
     margin-top: 10px;
     background-color: #16a34a;
@@ -184,4 +164,137 @@
 
 .close-btn:hover {
     background-color: #be123c;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .fresher-container {
+        padding: 20px;
+    }
+
+    .card-box {
+        padding: 20px 25px;
+        margin-bottom: 20px;
+    }
+
+    .card-box h3 {
+        font-size: 1.3rem;
+    }
+
+    .filters,
+    .add-fresher-form {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filters input,
+    .filters select,
+    .add-fresher-form input,
+    .add-fresher-form select,
+    .filters button,
+    .add-fresher-form button {
+        min-width: unset;
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .fresher-results {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .fresher-card {
+        padding: 15px;
+    }
+
+    .fresher-card h4 {
+        font-size: 1rem;
+    }
+
+    .fresher-card p {
+        font-size: 13px;
+    }
+
+    .view-btn {
+        padding: 7px 12px;
+        font-size: 13px;
+    }
+
+    .modal-content {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .modal-content h3 {
+        font-size: 18px;
+    }
+
+    .modal-content p {
+        font-size: 14px;
+    }
+
+    .close-btn {
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .fresher-container {
+        padding: 15px;
+    }
+
+    .card-box {
+        padding: 15px 20px;
+        margin-bottom: 15px;
+    }
+
+    .card-box h3 {
+        font-size: 1.2rem;
+    }
+
+    .filters input,
+    .filters select,
+    .add-fresher-form input,
+    .add-fresher-form select,
+    .filters button,
+    .add-fresher-form button {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .fresher-card {
+        padding: 12px;
+    }
+
+    .fresher-card h4 {
+        font-size: 0.95rem;
+    }
+
+    .fresher-card p {
+        font-size: 12px;
+    }
+
+    .view-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .modal-content {
+        padding: 15px;
+    }
+
+    .modal-content h3 {
+        font-size: 16px;
+    }
+
+    .modal-content p {
+        font-size: 13px;
+    }
+
+    .close-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
 }

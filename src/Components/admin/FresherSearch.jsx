@@ -4,6 +4,7 @@ import { auth, db } from '../../firebase';
 import { getIdToken } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import CsvUpload from './CsvUpload';
 
 const FresherSearch = ({ onAddFresher }) => {
     const [filters, setFilters] = useState({ skill: '', department: '', status: '', query: '' });
@@ -180,6 +181,9 @@ const FresherSearch = ({ onAddFresher }) => {
                         onChange={handleFresherChange}
                     />
                     <button onClick={handleAddFresherClick}>Add Fresher</button>
+                </div>
+                <div className="csv-upload-container">
+                    <CsvUpload />
                 </div>
             </div>
         </div>

@@ -52,3 +52,51 @@
 .download-btn:hover {
     background-color: #2980b9;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .report-section {
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 90%;
+    }
+
+    .report-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .report-dropdown {
+        width: 90%;
+        padding: 10px 14px;
+        font-size: 15px;
+    }
+
+    .download-btn {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-section {
+        padding: 15px;
+        margin: 15px auto;
+    }
+
+    .report-title {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+
+    .report-dropdown {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .download-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}

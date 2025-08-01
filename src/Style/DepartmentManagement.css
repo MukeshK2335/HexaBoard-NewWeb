@@ -342,22 +342,194 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .department-management {
+        padding: 15px;
+    }
+
     .department-management-header {
         flex-direction: column;
         gap: 15px;
         align-items: stretch;
+        padding: 15px;
+    }
+
+    .department-management-header h2 {
+        font-size: 20px;
     }
     
     .department-actions {
-        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
     }
-    
-    .form-row {
-        grid-template-columns: 1fr;
+
+    .add-department-btn, .assign-freshers-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 14px;
     }
-    
+
+    .department-item {
+        padding: 15px;
+    }
+
+    .department-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .department-header h3 {
+        font-size: 16px;
+    }
+
+    .department-stats {
+        margin-left: 0;
+    }
+
+    .department-details p {
+        font-size: 13px;
+    }
+
+    .department-members h4 {
+        font-size: 15px;
+    }
+
+    .member-item {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .remove-member-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
     .modal-content {
         width: 95%;
         margin: 10px;
+        padding: 15px;
     }
-} 
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-header h3 {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-footer {
+        padding: 15px;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .fresher-checkbox {
+        padding: 6px;
+    }
+
+    .cancel-btn, .save-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .department-management {
+        padding: 10px;
+    }
+
+    .department-management-header {
+        padding: 10px;
+    }
+
+    .department-management-header h2 {
+        font-size: 18px;
+    }
+
+    .add-department-btn, .assign-freshers-btn {
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+
+    .department-item {
+        padding: 10px;
+    }
+
+    .department-header h3 {
+        font-size: 14px;
+    }
+
+    .department-details p {
+        font-size: 12px;
+    }
+
+    .department-members h4 {
+        font-size: 14px;
+    }
+
+    .member-item {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .remove-member-btn {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    .modal-content {
+        padding: 10px;
+    }
+
+    .modal-header {
+        padding: 10px;
+    }
+
+    .modal-header h3 {
+        font-size: 16px;
+    }
+
+    .modal-body {
+        padding: 10px;
+    }
+
+    .modal-footer {
+        padding: 10px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .fresher-checkbox {
+        padding: 4px;
+        font-size: 12px;
+    }
+
+    .cancel-btn, .save-btn {
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+}

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { courseService } from '../../services/courseService';
 import '../../Style/DepartmentManagement.css';
+import { db } from '../../firebase'; // Import db from firebase.js
+import { collection, query, where, getDocs, updateDoc, doc, writeBatch, setDoc, limit } from 'firebase/firestore';
 
 const DepartmentManagement = () => {
     const [departments, setDepartments] = useState([]);
     const [freshers, setFreshers] = useState([]);
-    const [selectedDepartment, setSelectedDepartment] = useState('');
     const [showAddDepartment, setShowAddDepartment] = useState(false);
-    const [showAssignFreshers, setShowAssignFreshers] = useState(false);
     const [loading, setLoading] = useState(true);
     const [departmentForm, setDepartmentForm] = useState({
         name: '',
@@ -15,7 +15,31 @@ const DepartmentManagement = () => {
         manager: '',
         location: ''
     });
-    const [selectedFreshers, setSelectedFreshers] = useState([]);
+
+    // Helper function to find or create a department (client-side)
+    const findOrCreateDepartment = async (departmentName) => {
+        const departmentsRef = collection(db, "departments");
+        const q = query(departmentsRef, where("name", "==", departmentName), limit(1));
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+            const departmentDoc = snapshot.docs[0];
+            return { id: departmentDoc.id, ...departmentDoc.data() };
+        } else {
+            // Create new department
+            const newDepartmentRef = doc(departmentsRef);
+            await setDoc(newDepartmentRef, {
+                name: departmentName,
+                description: `Department for ${departmentName}`,
+                manager: "", // Default or placeholder
+                location: "", // Default or placeholder
+                memberCount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            return { id: newDepartmentRef.id, name: departmentName, memberCount: 0 };
+        }
+    };
 
     // Fetch departments and freshers
     useEffect(() => {
@@ -63,40 +87,6 @@ const DepartmentManagement = () => {
         }
     };
 
-    const handleAssignFreshers = async () => {
-        try {
-            if (!selectedDepartment) {
-                alert('Please select a department');
-                return;
-            }
-
-            if (selectedFreshers.length === 0) {
-                alert('Please select freshers to assign');
-                return;
-            }
-
-            // Assign each selected fresher to the department
-            for (const fresherId of selectedFreshers) {
-                await courseService.assignFresherToDepartment(fresherId, selectedDepartment);
-            }
-
-            // Refresh data
-            const [updatedDepartments, updatedFreshers] = await Promise.all([
-                courseService.getAllDepartments(),
-                courseService.getAllFreshers()
-            ]);
-            setDepartments(updatedDepartments);
-            setFreshers(updatedFreshers);
-            
-            setSelectedFreshers([]);
-            setShowAssignFreshers(false);
-            alert(`Successfully assigned ${selectedFreshers.length} freshers to department!`);
-        } catch (error) {
-            console.error('Error assigning freshers:', error);
-            alert('Failed to assign freshers to department');
-        }
-    };
-
     const handleRemoveFresherFromDepartment = async (fresherId, departmentId) => {
         try {
             await courseService.removeFresherFromDepartment(fresherId, departmentId);
@@ -120,8 +110,64 @@ const DepartmentManagement = () => {
         return freshers.filter(fresher => fresher.departmentId === departmentId);
     };
 
-    const getUnassignedFreshers = () => {
-        return freshers.filter(fresher => !fresher.departmentId);
+    const handleAutoAssignFreshers = async () => {
+        try {
+            setLoading(true);
+            let assignedCount = 0;
+            const batch = writeBatch(db);
+            const departmentUpdates = {}; // To track department member counts
+
+            const freshersRef = collection(db, "users");
+            const q = query(freshersRef, where("role", "==", "fresher"));
+            const snapshot = await getDocs(q);
+
+            for (const docSnapshot of snapshot.docs) {
+                const fresherData = docSnapshot.data();
+                const fresherId = docSnapshot.id;
+
+                // Only process if fresher has a department name and is not already assigned
+                if (fresherData.departmentName && !fresherData.departmentId) {
+                    const departmentName = fresherData.departmentName;
+                    const department = await findOrCreateDepartment(departmentName);
+
+                    // Update fresher's document with departmentId
+                    const fresherDocRef = doc(db, "users", fresherId);
+                    batch.update(fresherDocRef, { departmentId: department.id });
+
+                    // Prepare to increment department member count
+                    if (!departmentUpdates[department.id]) {
+                        departmentUpdates[department.id] = 0;
+                    }
+                    departmentUpdates[department.id]++;
+                    assignedCount++;
+                }
+            }
+
+            // Apply department member count updates
+            for (const deptId in departmentUpdates) {
+                const deptRef = doc(db, "departments", deptId);
+                batch.update(deptRef, {
+                    memberCount: (departmentUpdates[deptId] || 0) + (departments.find(d => d.id === deptId)?.memberCount || 0),
+                    updatedAt: new Date(),
+                });
+            }
+
+            await batch.commit();
+
+            alert(`${assignedCount} freshers were automatically assigned to departments.`);
+            // Refresh data after auto-assignment
+            const [updatedDepartments, updatedFreshers] = await Promise.all([
+                courseService.getAllDepartments(),
+                courseService.getAllFreshers()
+            ]);
+            setDepartments(updatedDepartments);
+            setFreshers(updatedFreshers);
+        } catch (error) {
+            console.error('Error during auto-assignment:', error);
+            alert('Error during auto-assignment: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -137,9 +183,10 @@ const DepartmentManagement = () => {
                     </button>
                     <button 
                         className="assign-freshers-btn"
-                        onClick={() => setShowAssignFreshers(true)}
+                        onClick={handleAutoAssignFreshers}
+                        disabled={loading} // Disable while loading
                     >
-                        Assign Freshers
+                        {loading ? 'Assigning...' : 'Auto Assign Freshers'}
                     </button>
                 </div>
             </div>
@@ -269,83 +316,8 @@ const DepartmentManagement = () => {
                     </div>
                 </div>
             )}
-
-            {/* Assign Freshers Modal */}
-            {showAssignFreshers && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h3>Assign Freshers to Department</h3>
-                            <button 
-                                className="close-btn"
-                                onClick={() => setShowAssignFreshers(false)}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label>Select Department:</label>
-                                <select 
-                                    value={selectedDepartment}
-                                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                                >
-                                    <option value="">Choose a department...</option>
-                                    {departments.map(dept => (
-                                        <option key={dept.id} value={dept.id}>
-                                            {dept.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Select Freshers:</label>
-                                <div className="freshers-selection">
-                                    {getUnassignedFreshers().map(fresher => (
-                                        <label key={fresher.id} className="fresher-checkbox">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedFreshers.includes(fresher.id)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setSelectedFreshers(prev => [...prev, fresher.id]);
-                                                    } else {
-                                                        setSelectedFreshers(prev => prev.filter(id => id !== fresher.id));
-                                                    }
-                                                }}
-                                            />
-                                            <span>{fresher.name || fresher.email}</span>
-                                        </label>
-                                    ))}
-                                    {getUnassignedFreshers().length === 0 && (
-                                        <p className="no-freshers">No unassigned freshers available.</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="modal-footer">
-                            <button 
-                                className="cancel-btn"
-                                onClick={() => setShowAssignFreshers(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                className="save-btn"
-                                onClick={handleAssignFreshers}
-                                disabled={!selectedDepartment || selectedFreshers.length === 0}
-                            >
-                                Assign Freshers
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
 
-export default DepartmentManagement; 
+export default DepartmentManagement;
