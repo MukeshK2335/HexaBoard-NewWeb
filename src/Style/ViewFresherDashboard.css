@@ -1,0 +1,189 @@
+/* Base layout */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9fafb;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    background-color: #0047BB;
+    color: #ffffff;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-header {
+    font-size: 1.6rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin: 15px 0;
+}
+
+/* Sidebar Links (clickable) */
+.sidebar-menu a,
+.sidebar-link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+/* Hover and Active states */
+.sidebar-menu a:hover,
+.sidebar-link:hover,
+.sidebar-menu a.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    font-weight: 600;
+}
+
+.sidebar-link:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    padding: 40px 30px;
+    overflow-y: auto;
+}
+
+/* Fresher Dashboard section */
+.fresher-dashboard {
+    width: 100%;
+}
+
+/* Fresher Profile Card */
+.fresher-profile-card {
+    background-color: #ffffff;
+    padding: 25px 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    margin-bottom: 30px;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.fresher-profile-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.fresher-profile-card h2 {
+    color: #0047BB;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.fresher-profile-card p {
+    font-size: 15px;
+    margin: 6px 0;
+    color: #374151;
+    line-height: 1.6;
+}
+
+/* Training Status Section */
+.training-status-section h3 {
+    font-size: 1.5rem;
+    color: #0047BB;
+    margin-bottom: 20px;
+}
+
+.training-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.status-card {
+    background-color: #ffffff;
+    border-left: 5px solid #0047BB;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.status-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.status-card p {
+    font-weight: 600;
+    font-size: 15px;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.status-card span {
+    font-size: 14px;
+    color: #374151;
+    background-color: #f3f4f6;
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding: 15px 10px;
+    }
+
+    .sidebar-header {
+        display: none;
+    }
+
+    .sidebar-menu {
+        display: flex;
+        gap: 10px;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .fresher-profile-card,
+    .status-card {
+        padding: 18px 20px;
+    }
+
+    .fresher-profile-card h2,
+    .training-status-section h3 {
+        font-size: 1.4rem;
+    }
+}

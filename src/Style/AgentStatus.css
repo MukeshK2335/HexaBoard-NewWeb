@@ -1,0 +1,48 @@
+.agent-section {
+    background: #ffffff;
+    padding: 30px;
+    margin: 40px auto;
+    max-width: 700px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+}
+
+.agent-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+.agent-table-wrapper {
+    overflow-x: auto;
+}
+
+.agent-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.agent-table th,
+.agent-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #eaeaea;
+    text-align: left;
+}
+
+.agent-table thead th {
+    background-color: #f5f7fa;
+    color: #34495e;
+}
+
+.agent-table tbody tr:hover {
+    background-color: #f0f8ff;
+}
+
+.error-cell {
+    color: red;
+    font-weight: bold;
+}
