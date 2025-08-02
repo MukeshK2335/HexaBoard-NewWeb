@@ -48,8 +48,14 @@ const Chatbot = () => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUser(user);
-                // Load user's chat history
-                loadChatHistory(user.uid);
+                // Clear previous chat history when user logs in
+                setMessages([]);
+                // Do NOT load chat history here if the intent is to clear it on login.
+                // Chat history will still be saved to Firebase, but not displayed on login.
+            } else {
+                // Clear messages if user logs out
+                setMessages([]);
+                setUser(null);
             }
         });
 
