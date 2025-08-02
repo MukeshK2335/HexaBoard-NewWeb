@@ -4,105 +4,174 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.login-container {
-    width: 400px;
-    max-width: 90%;
-    margin: 60px auto;
-    padding: 40px 30px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
+}
 
+.login-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Softer, modern gradient */
+    padding: 20px;
+}
+
+.login-logo {
+    width: 100px; /* Smaller logo */
+    margin-bottom: 35px; /* More space below logo */
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); /* Subtle shadow for logo */
+}
+
+.login-logo-small {
+    width: 80px; /* Adjust as needed */
+    margin-bottom: 20px;
+}
+
+.login-container {
+    width: 420px; /* Slightly wider container */
+    max-width: 95%;
+    margin-top: 0; /* Remove auto margin */
+    padding: 45px 35px; /* More padding */
+    background: #fff;
+    border-radius: 12px; /* Slightly more rounded corners */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2); /* Stronger, more prominent shadow */
     text-align: center;
     color: #333;
+    position: relative; /* For potential future absolute positioning of elements */
 }
 
 .login-heading {
     font-weight: 700;
-    font-size: 28px;
-    margin-bottom: 30px;
+    font-size: 30px; /* Slightly larger heading */
+    margin-bottom: 35px; /* More space below heading */
     color: #212121;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.5px; /* Increased letter spacing */
 }
 
 .tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 30px;
-    gap: 16px;
+    margin-bottom: 35px; /* More space below tabs */
+    gap: 20px; /* Increased gap between buttons */
 }
 
 .tabs button {
     flex: 1;
-    padding: 12px 0;
+    padding: 14px 0; /* More padding */
     border: none;
-    background: #f5f5f5;
+    background: #e0e0e0; /* Lighter default background */
     color: #555;
     font-weight: 600;
-    font-size: 16px;
-    border-radius: 6px;
+    font-size: 17px; /* Slightly larger font */
+    border-radius: 8px; /* More rounded buttons */
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease; /* Smooth transition for all properties */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1); /* Subtle shadow for buttons */
 }
 
 .tabs button.active,
 .tabs button:hover {
-    background: #007BFF;
+    background: #4a90e2; /* More vibrant blue */
     color: white;
-    box-shadow: 0 6px 12px rgba(0,123,255,0.4);
+    box-shadow: 0 8px 16px rgba(74,144,226,0.4); /* Stronger shadow on hover/active */
+    transform: translateY(-2px); /* Slight lift effect */
 }
 
 .form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px; /* Increased gap between form elements */
 }
 
 .form input {
-    padding: 14px 20px;
-    font-size: 15px;
-    border: 2px solid #ddd;
+    padding: 16px 22px; /* More padding */
+    font-size: 16px; /* Slightly larger font */
+    border: 1px solid #ccc; /* Lighter border */
     border-radius: 8px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .form input:focus {
-    border-color: #007BFF;
+    border-color: #4a90e2; /* Matching blue focus */
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+    box-shadow: 0 0 0 4px rgba(74,144,226,0.2); /* Wider focus shadow */
 }
 
 .form button {
-    padding: 14px;
-    font-size: 16px;
+    padding: 16px; /* More padding */
+    font-size: 18px; /* Larger font */
     font-weight: 700;
     border: none;
     border-radius: 8px;
-    background: #007BFF;
+    background: #4a90e2; /* Matching blue button */
     color: white;
     cursor: pointer;
-    box-shadow: 0 6px 10px rgba(0,123,255,0.3);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 15px rgba(74,144,226,0.3); /* Stronger button shadow */
+    transition: all 0.3s ease;
 }
 
 .form button:hover {
-    background: #0056b3;
-    box-shadow: 0 8px 16px rgba(0,86,179,0.5);
+    background: #357ABD; /* Darker blue on hover */
+    box-shadow: 0 10px 20px rgba(53,122,189,0.5); /* Even stronger shadow on hover */
+    transform: translateY(-2px); /* Slight lift effect */
 }
 
 .error {
-    margin-top: -12px;
-    font-size: 14px;
-    color: #d32f2f;
+    margin-top: -15px; /* Adjusted margin */
+    font-size: 15px; /* Slightly larger font */
+    color: #e74c3c; /* More prominent error color */
     font-weight: 600;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .login-container {
-        margin: 40px auto;
-        padding: 30px 25px;
+        padding: 35px 25px;
+    }
+
+    .login-heading {
+        font-size: 26px;
+        margin-bottom: 30px;
+    }
+
+    .tabs {
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .tabs button {
+        padding: 12px 0;
+        font-size: 16px;
+    }
+
+    .form input {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+
+    .form button {
+        padding: 14px;
+        font-size: 16px;
+    }
+
+    .error {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-logo {
+        width: 150px;
+        margin-bottom: 25px;
+    }
+
+    .login-container {
+        padding: 30px 20px;
+        max-width: 98%;
     }
 
     .login-heading {
@@ -111,6 +180,7 @@
     }
 
     .tabs {
+        flex-direction: column;
         gap: 10px;
         margin-bottom: 25px;
     }
@@ -118,6 +188,10 @@
     .tabs button {
         padding: 10px 0;
         font-size: 15px;
+    }
+
+    .form {
+        gap: 18px;
     }
 
     .form input {
@@ -132,47 +206,5 @@
 
     .error {
         font-size: 13px;
-    }
-}
-
-@media (max-width: 480px) {
-    .login-container {
-        padding: 25px 20px;
-        margin: 20px auto;
-        max-width: 95%;
-    }
-
-    .login-heading {
-        font-size: 22px;
-        margin-bottom: 20px;
-    }
-
-    .tabs {
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 20px;
-    }
-
-    .tabs button {
-        padding: 8px 0;
-        font-size: 14px;
-    }
-
-    .form {
-        gap: 15px;
-    }
-
-    .form input {
-        padding: 10px 15px;
-        font-size: 13px;
-    }
-
-    .form button {
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .error {
-        font-size: 12px;
     }
 }

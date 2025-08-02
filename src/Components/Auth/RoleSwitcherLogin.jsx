@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import '../../Style/RoleSwitcherLogin.css';
+import Logo from '../../assets/Logo.png'; // Import the logo
 
 const RoleSwitcherLogin = () => {
     const [role, setRole] = useState('fresher');
@@ -83,6 +84,7 @@ const RoleSwitcherLogin = () => {
 
     return (
         <div className="login-container">
+            <img src={Logo} alt="HexaBoard Logo" className="login-logo-small" />
             <h1 className="login-heading">HexaBoard Login</h1>
 
             <div className="tabs">
