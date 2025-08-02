@@ -7,6 +7,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../../firebase";
 import LoadingScreen from "../LoadingScreen.jsx";
 import MyCourses from "./MyCourses.jsx";
+import Chatbot from "./Chatbot.jsx";
 
 // Helper to format Firestore Timestamp or string
 function formatDate(ts) {
@@ -609,6 +610,9 @@ const Dashboard = () => {
                     {activeTab === 'dashboard' ? renderDashboard() : activeTab === 'courses' ? <MyCourses /> : renderCourses()}
                 </main>
             </div>
+
+            {/* Chatbot */}
+            <Chatbot />
         </div>
     );
 };

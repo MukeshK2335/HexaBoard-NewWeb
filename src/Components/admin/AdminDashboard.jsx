@@ -6,6 +6,7 @@ import Reports from './Reports';
 import AgentStatus from './AgentStatus';
 import CourseManagement from './CourseManagement';
 import DepartmentManagement from './DepartmentManagement';
+import ChatbotAnalytics from './ChatbotAnalytics';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -241,6 +242,8 @@ const addFresher = async (fresher) => {
                 return <CourseManagement />;
             case 'departments':
                 return <DepartmentManagement />;
+            case 'chatbot':
+                return <ChatbotAnalytics />;
             case 'csv-upload':
                 return <CsvUpload />;
             case 'settings':
@@ -368,6 +371,7 @@ const addFresher = async (fresher) => {
                         <li className={selectedTab === 'agent' ? 'active' : ''} onClick={() => { setSelectedTab('agent'); setIsSidebarOpen(false); }}>Agent Status</li>
                         <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => { setSelectedTab('courses'); setIsSidebarOpen(false); }}>Course Management</li>
                         <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => { setSelectedTab('departments'); setIsSidebarOpen(false); }}>Department Management</li>
+                        <li className={selectedTab === 'chatbot' ? 'active' : ''} onClick={() => { setSelectedTab('chatbot'); setIsSidebarOpen(false); }}>Chatbot Analytics</li>
                         
                         <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => { setSelectedTab('settings'); setIsSidebarOpen(false); }}>Settings</li>
                     </ul>
