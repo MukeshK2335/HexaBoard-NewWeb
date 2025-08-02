@@ -124,6 +124,7 @@ const DepartmentManagement = () => {
             for (const docSnapshot of snapshot.docs) {
                 const fresherData = docSnapshot.data();
                 const fresherId = docSnapshot.id;
+                console.log('Processing fresher:', fresherId, fresherData); // Added console.log
 
                 // Only process if fresher has a department name and is not already assigned
                 if (fresherData.departmentName && !fresherData.departmentId) {

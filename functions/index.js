@@ -3,46 +3,33 @@ const admin = require("firebase-admin");
 const csv = require("csv-parser");
 const Busboy = require("busboy");
 const stream = require("stream");
-const sgMail = require("@sendgrid/mail");
 
 admin.initializeApp();
-
-// Set SendGrid API Key from Firebase functions config
-sgMail.setApiKey(functions.config().sendgrid.key);
 
 // Limit concurrent containers
 functions.runWith({ maxInstances: 10 });
 
-function generatePassword(length = 10) {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#";
-    return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
+
 
 // Function to send a welcome email using SendGrid
-async function sendWelcomeEmail(email, name, password) {
-    const msg = {
-        to: email,
-        from: "noreply@yourdomain.com", // Replace with your verified SendGrid sender email
-        subject: "Welcome to HexaBoard!",
-        html: `
-            <p>Hello ${name},</p>
-            <p>Your account has been created. Here are your login credentials:</p>
-            <ul>
-                <li><strong>Email:</strong> ${email}</li>
-                <li><strong>Password:</strong> ${password}</li>
-            </ul>
-            <p>You can log in at <a href="https://hexaboard-newweb.web.app">HexaBoard</a>.</p>
-        `,
-    };
-
+async function sendWelcomeEmail(email, name, passwordResetLink) {
     try {
-        await sgMail.send(msg);
-        console.log(`Welcome email sent to ${email} via SendGrid`);
+        await admin.firestore().collection('mail').add({ // 'mail' is the default collection, change if you configured differently
+            to: email,
+            message: {
+                subject: 'Welcome to HexaBoard - Set Your Password!',
+                html: `
+                    <p>Hello ${name},</p>
+                    <p>Your account has been created for HexaBoard. Please click the link below to set your password and log in:</p>
+                    <p><a href="${passwordResetLink}">Set Your Password</a></p>
+                    <p>If you did not request this, please ignore this email.</p>
+                    <p>Thank you,<br>The HexaBoard Team</p>
+                `,
+            },
+        });
+        console.log(`Welcome email trigger sent for ${email}`);
     } catch (error) {
-        console.error(`Failed to send welcome email to ${email} via SendGrid:`, error);
-        if (error.response) {
-            console.error(error.response.body)
-        }
+        console.error('Error triggering welcome email:', error);
     }
 }
 
@@ -113,7 +100,6 @@ exports.uploadFreshers = functions.https.onRequest((req, res) => {
                         await admin.firestore().collection("users").doc(userRecord.uid).set({
                             name: user.name,
                             email: user.email,
-                            password: password, // Store the generated password
                             role: user.role,
                             departmentId: department.id, // Assign department ID
                             createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -126,7 +112,7 @@ exports.uploadFreshers = functions.https.onRequest((req, res) => {
                         });
 
                         // Send welcome email
-                        await sendWelcomeEmail(user.email, user.name, password);
+                        await sendWelcomeEmail(user.email, user.name, userRecord.uid);
 
                         success.push({ email: user.email });
                     } catch (err) {
@@ -151,7 +137,6 @@ exports.addFresher = functions.https.onRequest(async (req, res) => {
     }
 
     const { name, email, department: departmentName, startDate } = req.body; // Get departmentName
-    const password = generatePassword();
 
     try {
         // Find or create department
@@ -159,7 +144,7 @@ exports.addFresher = functions.https.onRequest(async (req, res) => {
 
         const userRecord = await admin.auth().createUser({
             email,
-            password,
+            // No initial password needed, user sets it via reset link
             displayName: name,
         });
 
@@ -169,7 +154,6 @@ exports.addFresher = functions.https.onRequest(async (req, res) => {
             departmentId: department.id, // Assign department ID
             startDate,
             role: "fresher",
-            password: password, // Store the generated password
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
@@ -179,8 +163,11 @@ exports.addFresher = functions.https.onRequest(async (req, res) => {
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-        // Send welcome email
-        await sendWelcomeEmail(email, name, password);
+        // Generate password reset link
+        const passwordResetLink = await admin.auth().generatePasswordResetLink(email);
+
+        // Send welcome email with password reset link
+        await sendWelcomeEmail(email, name, passwordResetLink);
 
         res.status(200).json({ success: true });
     } catch (error) {

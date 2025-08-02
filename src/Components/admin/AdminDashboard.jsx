@@ -142,29 +142,29 @@ const AdminDashboard = () => {
 
 
 
-const addFresher = async (fresher) => {
-  try {
-    const token = await getToken(); // <-- Your Firebase Auth token
-    const res = await fetch('http://localhost:5000/api/add-fresher', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // token is required!
-      },
-      body: JSON.stringify(fresher)
-    });
+const handleAddFresher = async (fresher) => {
+        try {
+            const token = await auth.currentUser.getIdToken(); // Get Firebase Auth token
+            const res = await fetch('http://localhost:5000/api/add-fresher', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // token is required!
+                },
+                body: JSON.stringify(fresher)
+            });
 
-    const data = await res.json();
-    if (data.success) {
-      alert('Fresher added and password sent via email!');
-    } else {
-      alert('Failed to add fresher');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('An error occurred');
-  }
-};
+            const data = await res.json();
+            if (data.success) {
+                alert('Fresher added. A password reset email has been sent to their email address.');
+            } else {
+                alert('Failed to add fresher');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('An error occurred');
+        }
+    };
 
 
 
@@ -212,23 +212,7 @@ const addFresher = async (fresher) => {
         }
     };
 
-    const handleAddFresher = async (fresherData) => {
-        try {
-            const response = await fetch('http://localhost:5000/api/add-fresher', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(fresherData)
-            });
-            if (response.ok) {
-                alert('Fresher added and password sent to email!');
-            } else {
-                const error = await response.json();
-                alert('Failed to add fresher: ' + (error.error || 'Unknown error'));
-            }
-        } catch (err) {
-            alert('Error adding fresher: ' + err.message);
-        }
-    };
+    
 
     const renderSection = () => {
         switch (selectedTab) {

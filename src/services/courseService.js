@@ -1,4 +1,5 @@
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
     collection,
     addDoc,
@@ -11,11 +12,91 @@ import {
     orderBy,
     onSnapshot,
     writeBatch,
-    setDoc
+    setDoc,
+    limit
 } from 'firebase/firestore';
+import { auth } from '../firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 // Course Service for Firebase operations
 export const courseService = {
+    // Helper function to find or create a department
+    async findOrCreateDepartment(departmentName) {
+        const departmentsRef = collection(db, "departments");
+        const q = query(departmentsRef, where("name", "==", departmentName), limit(1));
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+            const departmentDoc = snapshot.docs[0];
+            return { id: departmentDoc.id, ...departmentDoc.data() };
+        } else {
+            // Create new department
+            const newDepartmentRef = doc(departmentsRef);
+            await setDoc(newDepartmentRef, {
+                name: departmentName,
+                description: `Department for ${departmentName}`,
+                manager: "", // Default or placeholder
+                location: "", // Default or placeholder
+                memberCount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+            return { id: newDepartmentRef.id, name: departmentName, memberCount: 0 };
+        }
+    },
+
+    async addFresherWithDepartmentAssignment(fresherData) {
+        try {
+            const { email, name, departmentName, startDate } = fresherData;
+            const password = Math.random().toString(36).slice(-8); // Generate a random password
+
+            // 1. Create user in Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const uid = userCredential.user.uid;
+
+            // 2. Add fresher document to Firestore with departmentName
+            await setDoc(doc(db, 'users', uid), {
+                name,
+                email,
+                departmentName,
+                startDate,
+                role: 'fresher',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+
+            // 3. Find or create the department and get its ID
+            const department = await this.findOrCreateDepartment(departmentName);
+
+            // 4. Assign fresher to department by updating their document with departmentId
+            const fresherDocRef = doc(db, "users", uid);
+            await updateDoc(fresherDocRef, { departmentId: department.id });
+
+            // 5. Increment department member count
+            const departmentRef = doc(db, 'departments', department.id);
+            const departmentDoc = await getDocs(query(collection(db, 'departments'), where('__name__', '==', department.id)));
+            const currentMemberCount = departmentDoc.docs[0]?.data()?.memberCount || 0;
+            
+            await updateDoc(departmentRef, {
+                memberCount: currentMemberCount + 1,
+                updatedAt: new Date()
+            });
+
+            return { success: true, email, password };
+        } catch (error) {
+            console.error('Error adding fresher with department assignment:', error);
+            throw error;
+        }
+    },
+
+    // Upload a file to Firebase Storage
+    async uploadFile(file, path) {
+        const storageRef = ref(storage, path);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        return downloadURL;
+    },
+
     // Add a new course for a specific fresher
     async addCourseForFresher(fresherId, courseData) {
         try {

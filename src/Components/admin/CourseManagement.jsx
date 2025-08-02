@@ -31,11 +31,14 @@ const CourseManagement = () => {
         duration: '',
         level: 'Beginner',
         category: '',
+        thumbnail: null,
         modules: []
     });
     const [moduleForm, setModuleForm] = useState({
         title: '',
         description: '',
+        video: null,
+        videoThumbnail: null, // Added for video thumbnail
         lessons: []
     });
     const [lessonForm, setLessonForm] = useState({
@@ -129,8 +132,14 @@ const CourseManagement = () => {
                 return;
             }
 
+            let thumbnailUrl = '';
+            if (courseForm.thumbnail) {
+                thumbnailUrl = await courseService.uploadFile(courseForm.thumbnail, `thumbnails/${Date.now()}_${courseForm.thumbnail.name}`);
+            }
+
             const courseData = {
                 ...courseForm,
+                thumbnailUrl,
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 status: 'active',
@@ -151,6 +160,7 @@ const CourseManagement = () => {
                 duration: '',
                 level: 'Beginner',
                 category: '',
+                thumbnail: null,
                 modules: []
             });
             setShowAddCourse(false);
@@ -161,15 +171,27 @@ const CourseManagement = () => {
         }
     };
 
-    const handleAddModule = () => {
+    const handleAddModule = async () => {
         if (!moduleForm.title.trim()) {
             alert('Please enter module title');
             return;
         }
 
+        let videoUrl = '';
+        if (moduleForm.video) {
+            videoUrl = await courseService.uploadFile(moduleForm.video, `videos/${Date.now()}_${moduleForm.video.name}`);
+        }
+
+        let videoThumbnailUrl = '';
+        if (moduleForm.videoThumbnail) {
+            videoThumbnailUrl = await courseService.uploadFile(moduleForm.videoThumbnail, `videoThumbnails/${Date.now()}_${moduleForm.videoThumbnail.name}`);
+        }
+
         const newModule = {
             id: Date.now(),
             ...moduleForm,
+            videoUrl,
+            videoThumbnailUrl, // Added videoThumbnailUrl
             lessons: moduleForm.lessons || []
         };
 
@@ -181,6 +203,7 @@ const CourseManagement = () => {
         setModuleForm({
             title: '',
             description: '',
+            video: null,
             lessons: []
         });
     };
@@ -442,6 +465,14 @@ const CourseManagement = () => {
                                 />
                             </div>
 
+                            <div className="form-group">
+                                <label>Course Thumbnail:</label>
+                                <input
+                                    type="file"
+                                    onChange={(e) => setCourseForm(prev => ({...prev, thumbnail: e.target.files[0]}))}
+                                />
+                            </div>
+
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Instructor:</label>
@@ -529,6 +560,22 @@ const CourseManagement = () => {
                                         />
                                     </div>
 
+                                    <div className="form-group">
+                                        <label>Module Video:</label>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => setModuleForm(prev => ({...prev, video: e.target.files[0]}))}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Module Video Thumbnail:</label>
+                                        <input
+                                            type="file"
+                                            onChange={(e) => setModuleForm(prev => ({...prev, videoThumbnail: e.target.files[0]}))}
+                                        />
+                                    </div>
+
                                     {/* Add Lesson Form */}
                                     <div className="add-lesson-form">
                                         <h6>Add Lesson</h6>
@@ -602,4 +649,4 @@ const CourseManagement = () => {
     );
 };
 
-export default CourseManagement; 
+export default CourseManagement;

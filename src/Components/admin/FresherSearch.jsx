@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import '../../Style/FresherSearch.css';
 import { auth, db } from '../../firebase';
 import { getIdToken } from 'firebase/auth';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import CsvUpload from './CsvUpload';
+import { courseService } from '../../services/courseService'; // Import courseService
 
 const FresherSearch = ({ onAddFresher }) => {
     const [filters, setFilters] = useState({ skill: '', department: '', status: '', query: '' });
-    const [newFresher, setNewFresher] = useState({ name: '', email: '', department: '', startDate: '' });
+    const [newFresher, setNewFresher] = useState({ name: '', email: '', departmentName: '', startDate: '' });
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -24,37 +25,18 @@ const FresherSearch = ({ onAddFresher }) => {
     };
 
     const handleAddFresherClick = async () => {
-        if (!newFresher.name || !newFresher.email || !newFresher.department || !newFresher.startDate) {
+        if (!newFresher.name || !newFresher.email || !newFresher.departmentName || !newFresher.startDate) {
             alert("Please fill all fresher fields.");
             return;
         }
 
         try {
-            const user = auth.currentUser;
-            if (!user) {
-                alert('User not authenticated');
-                return;
-            }
-            const token = await getIdToken(user);
-            const response = await fetch('http://localhost:5000/api/add-fresher', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name: newFresher.name,
-                    email: newFresher.email,
-                    department: newFresher.department,
-                    startDate: newFresher.startDate
-                })
-            });
-            const data = await response.json();
-            if (data.success) {
-                alert('Fresher added successfully');
-                setNewFresher({ name: '', email: '', department: '', startDate: '' });
+            const result = await courseService.addFresherWithDepartmentAssignment(newFresher);
+            if (result.success) {
+                alert(`Fresher ${result.email} added successfully! Password: ${result.password}`);
+                setNewFresher({ name: '', email: '', departmentName: '', startDate: '' });
             } else {
-                alert('Failed to add fresher: ' + (data.error || 'Unknown error'));
+                alert('Failed to add fresher: ' + (result.error || 'Unknown error'));
             }
         } catch (error) {
             alert('Error adding fresher: ' + error.message);
@@ -168,7 +150,7 @@ const FresherSearch = ({ onAddFresher }) => {
                         value={newFresher.email}
                         onChange={handleFresherChange}
                     />
-                    <select name="department" value={newFresher.department} onChange={handleFresherChange}>
+                    <select name="departmentName" value={newFresher.departmentName} onChange={handleFresherChange}>
                         <option value="">Select Department</option>
                         <option value="IT">IT</option>
                         <option value="HR">HR</option>

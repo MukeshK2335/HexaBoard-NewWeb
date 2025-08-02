@@ -45,7 +45,7 @@ const CsvUpload = () => {
                         await setDoc(doc(db, 'users', uid), {
                             name,
                             email,
-                            department,
+                            departmentName: department, // Changed from 'department' to 'departmentName'
                             role,
                         });
 
