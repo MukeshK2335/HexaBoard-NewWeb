@@ -5,6 +5,8 @@ import FresherDashboard from './Components/fresher/FresherDashboard.jsx';
 import ProtectedRoute from './Components/ProtectedRoute.jsx';
 import LandingPage from './Components/LandingPage.jsx';
 import ViewFresherDashboard from './Components/fresher/ViewFresherDashboard.jsx'; // 👈 NEW component
+import FresherLearning from './Components/fresher/FresherLearning.jsx';
+import CourseDetailView from './Components/fresher/CourseDetailView.jsx';
 import './App.css';
 
 function App() {
@@ -42,6 +44,20 @@ function App() {
                 <Route path="/fresher/:email" element={
                     <ProtectedRoute>
                         <ViewFresherDashboard />
+                    </ProtectedRoute>
+                } />
+
+                {/* Fresher Learning Page */}
+                <Route path="/fresher/learning" element={
+                    <ProtectedRoute>
+                        <FresherLearning />
+                    </ProtectedRoute>
+                } />
+
+                {/* Course Detail View for Freshers */}
+                <Route path="/fresher/learning/:courseId" element={
+                    <ProtectedRoute>
+                        <CourseDetailView />
                     </ProtectedRoute>
                 } />
 

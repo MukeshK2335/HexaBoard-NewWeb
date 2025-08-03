@@ -8,7 +8,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyBlrQOpX-BWgJ6fb5zQks9MfmTke1Ls3ys",
     authDomain: "hexaboard-a9ea8.firebaseapp.com",
     projectId: "hexaboard-a9ea8",
-    storageBucket: "hexaboard-a9ea8.appspot.com",
+    storageBucket: "hexaboard-a9ea8.firebasestorage.app",
     messagingSenderId: "86808097323",
     appId: "1:86808097323:web:6f17bdc779424f9c0b706e"
 };

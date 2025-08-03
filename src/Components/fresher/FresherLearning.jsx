@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { db, auth } from '../../firebase';
 import { 
     collection, 
@@ -52,131 +53,29 @@ const FresherLearning = () => {
             const enrolledCourseIds = userData?.enrolledCourses || [];
             
             // Fetch all courses
-            const coursesSnapshot = await getDocs(collection(db, 'courses'));
+            const coursesSnapshot = await getDocs(collection(db, 'users', userId, 'courses'));
             const allCourses = coursesSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
             
-            // Add sample courses if none exist
-            const sampleCourses = [
-                {
-                    id: 'web-dev-2024',
-                    title: 'Complete Web Development Bootcamp 2024',
-                    description: 'Learn HTML, CSS, JavaScript, React, Node.js, MongoDB and more!',
-                    instructor: 'Sarah Johnson',
-                    instructorTitle: 'Full Stack Developer & Instructor',
-                    rating: 4.7,
-                    reviews: 15420,
-                    duration: '42.5 hours',
-                    lectures: 385,
-                    level: 'All Levels',
-                    price: 89.99,
-                    originalPrice: 199.99,
-                    discount: '55% off',
-                    category: 'Technical',
-                    difficulty: 'Beginner',
-                    image: 'https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=400'
-                },
-                {
-                    id: 'data-science-ml',
-                    title: 'Data Science & Machine Learning Masterclass',
-                    description: 'Master Python, NumPy, Pandas, Scikit-learn, TensorFlow and more!',
-                    instructor: 'Dr. Michael Chen',
-                    instructorTitle: 'Senior Data Scientist at Google',
-                    rating: 4.8,
-                    reviews: 8920,
-                    duration: '58.5 hours',
-                    lectures: 425,
-                    level: 'Intermediate',
-                    price: 129.99,
-                    originalPrice: 299.99,
-                    discount: '57% off',
-                    category: 'Technical',
-                    difficulty: 'Intermediate',
-                    image: 'https://images.pexels.com/photos/590020/pexels-photo-590020.jpeg?auto=compress&cs=tinysrgb&w=400'
-                },
-                {
-                    id: 'digital-marketing',
-                    title: 'Digital Marketing & Social Media Strategy',
-                    description: 'Learn SEO, SEM, Social Media Marketing, Email Marketing and more!',
-                    instructor: 'Emma Rodriguez',
-                    instructorTitle: 'Digital Marketing Expert & Consultant',
-                    rating: 4.6,
-                    reviews: 6230,
-                    duration: '28.5 hours',
-                    lectures: 245,
-                    level: 'Beginner',
-                    price: 69.99,
-                    originalPrice: 149.99,
-                    discount: '53% off',
-                    category: 'Business',
-                    difficulty: 'Beginner',
-                    image: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=400'
-                }
-            ];
+            setEnrolledCourses(allCourses);
+            setAvailableCourses(allCourses); // For now, all assigned courses are available
             
-            const coursesToUse = allCourses.length > 0 ? allCourses : sampleCourses;
-            
-            // Separate enrolled and available courses
-            const enrolled = coursesToUse.filter(course => enrolledCourseIds.includes(course.id));
-            const available = coursesToUse.filter(course => !enrolledCourseIds.includes(course.id));
-            
-            setEnrolledCourses(enrolled);
-            setAvailableCourses(coursesToUse);
-            
-            // Fetch user progress
-            const progressQuery = query(
-                collection(db, 'userProgress'),
-                where('userId', '==', userId)
-            );
-            const progressSnapshot = await getDocs(progressQuery);
+            // Progress is already part of the course data from CourseManagement.jsx
+            // No need for separate userProgress collection or sample progress data
             const progressData = {};
-            progressSnapshot.docs.forEach(doc => {
-                const data = doc.data();
-                progressData[data.courseId] = data;
+            allCourses.forEach(course => {
+                progressData[course.id] = { overallProgress: course.progress || 0 };
             });
-            
-            // Add sample progress data
-            const sampleProgress = {
-                'web-dev-2024': { overallProgress: 75 },
-                'data-science-ml': { overallProgress: 45 },
-                'digital-marketing': { overallProgress: 20 }
-            };
-            
-            setProgress({ ...progressData, ...sampleProgress });
+            setProgress(progressData);
             
         } catch (error) {
             console.error('Error fetching user data:', error);
         }
     };
 
-    const enrollInCourse = async (courseId) => {
-        try {
-            const userId = auth.currentUser.uid;
-            const userRef = doc(db, 'users', userId);
-            const userDoc = await getDoc(userRef);
-            const currentEnrolled = userDoc.data()?.enrolledCourses || [];
-            
-            await updateDoc(userRef, {
-                enrolledCourses: [...currentEnrolled, courseId]
-            });
-            
-            // Create initial progress record
-            await addDoc(collection(db, 'userProgress'), {
-                userId,
-                courseId,
-                completedModules: [],
-                overallProgress: 0,
-                startedAt: serverTimestamp(),
-                lastAccessedAt: serverTimestamp()
-            });
-            
-            fetchUserData();
-        } catch (error) {
-            console.error('Error enrolling in course:', error);
-        }
-    };
+    
 
     const getFilteredCourses = () => {
         switch (activeFilter) {
@@ -237,7 +136,7 @@ const FresherLearning = () => {
                 {getFilteredCourses().map(course => (
                     <div key={course.id} className="course-card">
                         <div className="course-image">
-                            <img src={course.image} alt={course.title} />
+                            <img src={course.thumbnailUrl} alt={course.title} />
                             {progress[course.id] && (
                                 <div className="progress-circle">
                                     <span>{progress[course.id].overallProgress}%</span>

@@ -1,783 +1,158 @@
 .my-courses {
-    padding: 20px;
-    background: #f8fafc;
-    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f9fafb;
 }
 
 .courses-header {
+    margin-bottom: 2rem;
     text-align: center;
-    margin-bottom: 40px;
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .courses-header h2 {
-    margin: 0 0 10px 0;
-    color: #1e293b;
-    font-size: 28px;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #111827;
 }
 
 .courses-header p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 16px;
-}
-
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-    color: #6b7280;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e5e7eb;
-    border-top: 4px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 16px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.no-courses {
-    text-align: center;
-    padding: 80px 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.no-courses-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
-}
-
-.no-courses h3 {
-    margin: 0 0 12px 0;
-    color: #1e293b;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.no-courses p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 16px;
+    font-size: 1.125rem;
+    color: #4b5563;
 }
 
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
 }
 
 .course-card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
 }
 
 .course-card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.course-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-}
-
-.course-status {
-    display: flex;
-    gap: 8px;
-}
-
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    color: white;
-    text-transform: capitalize;
-}
-
-.course-progress {
-    display: flex;
-    align-items: center;
-}
-
-.progress-circle {
-    position: relative;
-    width: 40px;
-    height: 40px;
-}
-
-.progress-circle svg {
+.course-thumbnail img {
     width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
-}
-
-.progress-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 10px;
-    font-weight: 600;
-    color: #1e293b;
+    height: 150px;
+    object-fit: cover;
 }
 
 .course-content {
-    flex: 1;
+    padding: 1.5rem;
 }
 
 .course-title {
-    margin: 0 0 12px 0;
-    color: #1e293b;
-    font-size: 18px;
+    font-size: 1.25rem;
     font-weight: 600;
-    line-height: 1.3;
+    color: #111827;
+    margin-bottom: 0.5rem;
 }
 
-.course-description {
-    margin: 0 0 16px 0;
+.course-instructor {
+    font-size: 0.875rem;
     color: #6b7280;
-    font-size: 14px;
-    line-height: 1.5;
 }
 
-.course-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 20px;
+.no-courses {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-.meta-item {
-    font-size: 12px;
-    color: #374151;
+.no-courses-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
 }
 
-.meta-item strong {
-    color: #1e293b;
+.no-courses h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
 }
 
-.view-course-btn {
-    width: 100%;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.no-courses p {
+    color: #6b7280;
 }
 
-.view-course-btn:hover {
-    background: #2563eb;
-}
-
-/* Modal Styles */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     z-index: 1000;
 }
 
 .modal-content {
-    background: white;
-    border-radius: 12px;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     width: 90%;
-    max-width: 900px;
+    max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 24px;
+    align-items: center;
+    padding: 1.5rem;
     border-bottom: 1px solid #e5e7eb;
 }
 
-.modal-course-info h3 {
-    margin: 0 0 8px 0;
-    color: #1e293b;
-    font-size: 24px;
+.modal-header h3 {
+    font-size: 1.5rem;
     font-weight: 600;
-}
-
-.modal-subtitle {
-    margin: 0;
-    color: #6b7280;
-    font-size: 16px;
 }
 
 .close-btn {
     background: none;
     border: none;
-    font-size: 24px;
+    font-size: 2rem;
     cursor: pointer;
-    color: #6b7280;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.close-btn:hover {
-    color: #374151;
+    color: #9ca3af;
 }
 
 .modal-body {
-    padding: 24px;
+    padding: 1.5rem;
 }
 
-.course-overview {
-    margin-bottom: 32px;
+.course-description {
+    margin-bottom: 1.5rem;
 }
 
-.overview-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
+.lectures-list {
+    margin-top: 1.5rem;
 }
 
-.stat-item {
-    background: #f8fafc;
-    padding: 16px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.stat-label {
-    display: block;
-    font-size: 12px;
-    color: #6b7280;
-    margin-bottom: 4px;
-    font-weight: 500;
-}
-
-.stat-value {
-    display: block;
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e293b;
-}
-
-.course-instructor {
-    background: #f0f9ff;
-    padding: 16px;
-    border-radius: 8px;
-    border-left: 4px solid #3b82f6;
-}
-
-.course-instructor h4 {
-    margin: 0 0 8px 0;
-    color: #1e293b;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.course-instructor p {
-    margin: 0;
-    color: #374151;
-    font-size: 14px;
-}
-
-.course-curriculum h4 {
-    margin: 0 0 20px 0;
-    color: #1e293b;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.module-item {
-    background: #f9fafb;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 16px;
+.lecture-item {
+    margin-bottom: 1.5rem;
     border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
 }
 
-.module-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.module-header h5 {
-    margin: 0;
-    color: #1e293b;
-    font-size: 16px;
+.lecture-item h4 {
+    font-size: 1.25rem;
     font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
-.module-progress {
-    background: #3b82f6;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.module-description {
-    margin: 0 0 16px 0;
-    color: #6b7280;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.module-progress-bar {
-    width: 100%;
-    height: 8px;
-    background: #e5e7eb;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 16px;
-}
-
-.module-progress-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
-
-.lessons-list {
-    display: grid;
-    gap: 12px;
-}
-
-.lesson-item {
-    background: white;
-    border-radius: 6px;
-    padding: 16px;
-    border: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.lesson-info {
-    flex: 1;
-}
-
-.lesson-title {
-    display: block;
-    font-weight: 500;
-    color: #1e293b;
-    font-size: 14px;
-    margin-bottom: 4px;
-}
-
-.lesson-duration {
-    display: block;
-    color: #6b7280;
-    font-size: 12px;
-}
-
-.lesson-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.lesson-status-btn {
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid #d1d5db;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.lesson-status-btn:hover {
-    background: #e5e7eb;
-}
-
-.lesson-status-btn.completed {
-    background: #10b981;
-    color: white;
-    border-color: #10b981;
-}
-
-.lesson-status-btn.completed:hover {
-    background: #059669;
-}
-
-.watch-video-btn {
-    background: #3b82f6;
-    color: white;
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    transition: background-color 0.2s;
-}
-
-.watch-video-btn:hover {
-    background: #2563eb;
-}
-
-.no-lessons,
-.no-modules {
-    text-align: center;
-    color: #6b7280;
-    font-style: italic;
-    padding: 20px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .my-courses {
-        padding: 15px;
-    }
-
-    .courses-header {
-        padding: 20px;
-        margin-bottom: 30px;
-    }
-
-    .courses-header h2 {
-        font-size: 24px;
-    }
-
-    .courses-header p {
-        font-size: 15px;
-    }
-
-    .no-courses {
-        padding: 60px 15px;
-    }
-
-    .no-courses-icon {
-        font-size: 50px;
-    }
-
-    .no-courses h3 {
-        font-size: 18px;
-    }
-
-    .no-courses p {
-        font-size: 15px;
-    }
-
-    .courses-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .course-card {
-        padding: 20px;
-    }
-
-    .course-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .course-status {
-        flex-wrap: wrap;
-    }
-
-    .course-title {
-        font-size: 16px;
-    }
-
-    .course-description {
-        font-size: 13px;
-    }
-
-    .course-meta {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .meta-item {
-        font-size: 11px;
-    }
-
-    .view-course-btn {
-        padding: 10px 15px;
-        font-size: 14px;
-    }
-
-    .modal-content {
-        width: 95%;
-        margin: 15px;
-    }
-
-    .modal-header {
-        padding: 20px;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .modal-course-info h3 {
-        font-size: 20px;
-    }
-
-    .modal-subtitle {
-        font-size: 15px;
-    }
-
-    .close-btn {
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 20px;
-    }
-
-    .overview-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .stat-item {
-        padding: 12px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-    }
-
-    .stat-value {
-        font-size: 16px;
-    }
-
-    .course-instructor {
-        padding: 12px;
-    }
-
-    .course-instructor h4 {
-        font-size: 15px;
-    }
-
-    .course-instructor p {
-        font-size: 13px;
-    }
-
-    .course-curriculum h4 {
-        font-size: 18px;
-    }
-
-    .module-item {
-        padding: 15px;
-    }
-
-    .module-header h5 {
-        font-size: 15px;
-    }
-
-    .module-description {
-        font-size: 13px;
-    }
-
-    .lessons-list {
-        gap: 10px;
-    }
-
-    .lesson-item {
-        padding: 12px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .lesson-title {
-        font-size: 13px;
-    }
-
-    .lesson-duration {
-        font-size: 11px;
-    }
-
-    .lesson-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .lesson-status-btn, .watch-video-btn {
-        padding: 5px 10px;
-        font-size: 11px;
-    }
-}
-
-@media (max-width: 480px) {
-    .my-courses {
-        padding: 10px;
-    }
-
-    .courses-header {
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-
-    .courses-header h2 {
-        font-size: 20px;
-    }
-
-    .courses-header p {
-        font-size: 14px;
-    }
-
-    .no-courses {
-        padding: 40px 10px;
-    }
-
-    .no-courses-icon {
-        font-size: 40px;
-    }
-
-    .no-courses h3 {
-        font-size: 16px;
-    }
-
-    .no-courses p {
-        font-size: 14px;
-    }
-
-    .course-card {
-        padding: 15px;
-    }
-
-    .course-title {
-        font-size: 15px;
-    }
-
-    .course-description {
-        font-size: 12px;
-    }
-
-    .view-course-btn {
-        padding: 8px 12px;
-        font-size: 13px;
-    }
-
-    .modal-content {
-        margin: 10px;
-        padding: 15px;
-    }
-
-    .modal-header {
-        padding: 15px;
-    }
-
-    .modal-course-info h3 {
-        font-size: 18px;
-    }
-
-    .modal-subtitle {
-        font-size: 14px;
-    }
-
-    .close-btn {
-        font-size: 18px;
-    }
-
-    .modal-body {
-        padding: 15px;
-    }
-
-    .overview-stats {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .stat-item {
-        padding: 10px;
-    }
-
-    .stat-label {
-        font-size: 10px;
-    }
-
-    .stat-value {
-        font-size: 14px;
-    }
-
-    .course-instructor {
-        padding: 10px;
-    }
-
-    .course-instructor h4 {
-        font-size: 14px;
-    }
-
-    .course-instructor p {
-        font-size: 12px;
-    }
-
-    .course-curriculum h4 {
-        font-size: 16px;
-    }
-
-    .module-item {
-        padding: 12px;
-    }
-
-    .module-header h5 {
-        font-size: 14px;
-    }
-
-    .module-description {
-        font-size: 12px;
-    }
-
-    .lessons-list {
-        gap: 8px;
-    }
-
-    .lesson-item {
-        padding: 10px;
-    }
-
-    .lesson-title {
-        font-size: 12px;
-    }
-
-    .lesson-duration {
-        font-size: 10px;
-    }
-
-    .lesson-status-btn, .watch-video-btn {
-        padding: 4px 8px;
-        font-size: 10px;
-    }
+.lecture-item p {
+    margin-bottom: 1rem;
 }

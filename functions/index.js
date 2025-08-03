@@ -111,8 +111,11 @@ exports.uploadFreshers = functions.https.onRequest((req, res) => {
                             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
                         });
 
+                        // Generate password reset link
+                        const passwordResetLink = await admin.auth().generatePasswordResetLink(user.email);
+
                         // Send welcome email
-                        await sendWelcomeEmail(user.email, user.name, userRecord.uid);
+                        await sendWelcomeEmail(user.email, user.name, passwordResetLink);
 
                         success.push({ email: user.email });
                     } catch (err) {
