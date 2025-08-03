@@ -12,7 +12,8 @@ import {
     orderBy,
     onSnapshot,
     writeBatch,
-    setDoc
+    setDoc,
+    getDoc
 } from 'firebase/firestore';
 
 // Helper function to generate a random password
@@ -141,13 +142,35 @@ export const courseService = {
     async markCourseAsCompleted(fresherId, courseId) {
         try {
             const courseRef = doc(db, 'users', fresherId, 'courses', courseId);
+            const courseDoc = await getDoc(courseRef);
+
+            if (!courseDoc.exists()) {
+                throw new Error('Course not found.');
+            }
+
+            const courseData = courseDoc.data();
+
             await updateDoc(courseRef, {
                 status: 'completed',
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                progress: 100 // Ensure progress is 100% when completed
             });
+
+            // Add a new assessment assignment
+            const assignmentsRef = collection(db, 'users', fresherId, 'assignments');
+            await addDoc(assignmentsRef, {
+                type: 'assessment',
+                courseId: courseId,
+                courseTitle: courseData.title, // Use the title of the completed course
+                status: 'pending',
+                assignedAt: new Date(),
+                dueDate: null, // You might want to set a due date
+                description: `Take the assessment for ${courseData.title}`,
+            });
+
             return { success: true };
         } catch (error) {
-            console.error('Error marking course as completed:', error);
+            console.error('Error marking course as completed and assigning assessment:', error);
             throw error;
         }
     },

@@ -191,3 +191,100 @@ exports.addFresher = functions.https.onRequest(async (req, res) => {
         }
     });
 });
+
+exports.getFreshersCount = functions.https.onCall(async (data, context) => {
+    try {
+        const freshersRef = admin.firestore().collection("users");
+        const q = freshersRef.where("role", "==", "fresher");
+        const snapshot = await q.count().get();
+        return { count: snapshot.data().count };
+    } catch (error) {
+        console.error("Error getting freshers count:", error);
+        throw new functions.https.HttpsError("internal", "Unable to fetch freshers count.", error.message);
+    }
+});
+
+exports.getCoursesCount = functions.https.onCall(async (data, context) => {
+    try {
+        const coursesRef = admin.firestore().collection("courses");
+        const snapshot = await coursesRef.count().get();
+        return { count: snapshot.data().count };
+    } catch (error) {
+        console.error("Error getting courses count:", error);
+        throw new functions.https.HttpsError("internal", "Unable to fetch courses count.", error.message);
+    }
+});
+
+exports.getSubmissionsCount = functions.https.onCall(async (data, context) => {
+    try {
+        const submissionsRef = admin.firestore().collection("submissions");
+        const snapshot = await submissionsRef.count().get();
+        return { count: snapshot.data().count };
+    } catch (error) {
+        console.error("Error getting submissions count:", error);
+        throw new functions.https.HttpsError("internal", "Unable to fetch submissions count.", error.message);
+    }
+});
+
+exports.getActiveUsersCount = functions.https.onCall(async (data, context) => {
+    try {
+        // For simplicity, let's define active users as those with role 'fresher' and 'status' as 'active'
+        // You might need to adjust this based on your actual 'active user' definition and data structure
+        const activeUsersRef = admin.firestore().collection("users");
+        const q = activeUsersRef.where("role", "==", "fresher").where("status", "==", "active");
+        const snapshot = await q.count().get();
+        return { count: snapshot.data().count };
+    } catch (error) {
+        console.error("Error getting active users count:", error);
+        throw new functions.https.HttpsError("internal", "Unable to fetch active users count.", error.message);
+    }
+});
+
+exports.deleteFresher = functions.https.onCall(async (data, context) => {
+    // Ensure the user is authenticated and is an admin
+    if (!context.auth || context.auth.token.role !== 'admin') {
+        throw new functions.https.HttpsError('permission-denied', 'Only admins can delete freshers.');
+    }
+
+    const { uid, email } = data;
+
+    if (!uid) {
+        throw new functions.https.HttpsError('invalid-argument', 'User ID (uid) is required.');
+    }
+
+    try {
+        // Delete user from Firebase Authentication
+        await admin.auth().deleteUser(uid);
+
+        // Delete user's document from Firestore
+        await admin.firestore().collection('users').doc(uid).delete();
+
+        // Optionally, delete any subcollections or related data for the user
+        // For example, if freshers have a 'courses' subcollection:
+        const coursesRef = admin.firestore().collection('users').doc(uid).collection('courses');
+        const coursesSnapshot = await coursesRef.get();
+        const batch = admin.firestore().batch();
+        coursesSnapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+
+        console.log(`Successfully deleted user: ${email} (UID: ${uid})`);
+        return { success: true, message: `User ${email} deleted successfully.` };
+    } catch (error) {
+        console.error(`Error deleting user ${email} (UID: ${uid}):`, error);
+        // Check if the error is due to user not found in Auth
+        if (error.code === 'auth/user-not-found') {
+            // If user not found in Auth, still try to delete from Firestore
+            try {
+                await admin.firestore().collection('users').doc(uid).delete();
+                console.log(`User ${email} not found in Auth but deleted from Firestore.`);
+                return { success: true, message: `User ${email} not found in Auth but deleted from Firestore.` };
+            } catch (firestoreError) {
+                console.error(`Error deleting user from Firestore after Auth error:`, firestoreError);
+                throw new functions.https.HttpsError('internal', 'Failed to delete user from Firestore after Auth error.', firestoreError.message);
+            }
+        }
+        throw new functions.https.HttpsError('internal', 'Failed to delete user.', error.message);
+    }
+});

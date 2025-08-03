@@ -75,6 +75,7 @@ const MyCourses = () => {
                         <div key={course.id} className={`course-card ${course.completed ? 'completed-course' : ''}`} onClick={() => handleCourseClick(course.id)}>
                             <div className="course-thumbnail">
                                 <img src={course.thumbnailUrl || 'https://via.placeholder.com/300x150'} alt={`${course.title} thumbnail`} />
+                                {course.completed && <span className="completed-badge">Completed</span>}
                             </div>
                             <div className="course-content">
                                 <h3 className="course-title">{course.title}</h3>

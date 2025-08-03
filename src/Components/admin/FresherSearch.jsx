@@ -3,6 +3,7 @@ import '../../Style/FresherSearch.css';
 import { auth, db } from '../../firebase';
 import { getIdToken } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useNavigate } from 'react-router-dom';
 import CsvUpload from './CsvUpload';
 import { courseService } from '../../services/courseService'; // Import courseService
@@ -115,6 +116,26 @@ const FresherSearch = ({ onAddFresher }) => {
         }
     };
 
+    const handleDeleteFresher = async (fresherId, fresherEmail) => {
+        if (window.confirm(`Are you sure you want to delete ${fresherEmail} from the system? This action cannot be undone.`)) {
+            try {
+                const functions = getFunctions();
+                const deleteFresher = httpsCallable(functions, 'deleteFresher');
+                const result = await deleteFresher({ uid: fresherId, email: fresherEmail });
+
+                if (result.data.success) {
+                    alert(`${fresherEmail} deleted successfully.`);
+                    handleSearch(); // Refresh the search results
+                } else {
+                    alert(`Failed to delete ${fresherEmail}: ${result.data.error}`);
+                }
+            } catch (error) {
+                console.error("Error deleting fresher:", error);
+                alert("An error occurred while deleting the fresher.");
+            }
+        }
+    };
+
     return (
         <div className="fresher-container">
             <div className="card-box">
@@ -155,6 +176,7 @@ const FresherSearch = ({ onAddFresher }) => {
                                 <div style={{marginBottom: 8}}><strong>Start Date:</strong> {f.startDate || '-'}</div>
                                 <button onClick={() => navigate(`/admin/fresher/${f.id}`)} style={{background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer'}}>View</button>
                                 <button onClick={() => handleResetProgress(f.id)} style={{background: '#dc3545', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer', marginLeft: '10px'}}>Reset Progress</button>
+                                <button onClick={() => handleDeleteFresher(f.id, f.email)} style={{background: '#dc3545', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer', marginLeft: '10px'}}>Delete</button>
                             </div>
                         ))}
                     </div>

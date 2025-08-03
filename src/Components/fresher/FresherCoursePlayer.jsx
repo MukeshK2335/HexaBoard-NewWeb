@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db, auth } from '../../firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import '../../Style/FresherCoursePlayer.css';
 
@@ -84,10 +84,21 @@ const FresherCoursePlayer = () => {
                     completed: true
                 });
                 alert('Course Finished and Progress Saved!');
-                navigate('/fresher/my-courses');
+                // Create a new assignment for the completed course
+                const assignmentsCollectionRef = collection(db, 'users', user.uid, 'assignments');
+                await addDoc(assignmentsCollectionRef, {
+                    courseId: course.id,
+                    courseTitle: course.title,
+                    status: 'pending', // Or 'assigned', 'new', etc.
+                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Example: Due in 7 days
+                    createdAt: new Date(),
+                    // Add any other relevant assessment details here
+                });
+                alert('New assignment created for this course!');
+                navigate('/fresher/dashboard', { state: { activeTab: 'assignments' } }); // Redirect to dashboard and activate assignments tab
             } catch (error) {
-                console.error("Error marking course as finished:", error);
-                alert('Failed to mark course as finished. Please try again.');
+                console.error("Error marking course as finished or creating assignment:", error);
+                alert('Failed to mark course as finished or create assignment. Please try again.');
             }
         }
     };

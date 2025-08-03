@@ -19,6 +19,7 @@ import {
     where,
     limit
 } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 import adminpng from '../../assets/admin-logo.png';
@@ -75,36 +76,60 @@ const AdminDashboard = () => {
         return () => unsubscribe();
     }, []);
 
-    // Fetch freshers count in real-time
+    // Fetch freshers count using Cloud Function
     useEffect(() => {
-        const unsubscribe = onSnapshot(query(collection(db, 'users'), where('role', '==', 'fresher')), (snapshot) => {
-            setFreshersCount(snapshot.size);
-        });
-        return () => unsubscribe();
+        const functions = getFunctions();
+        const getFreshersCount = httpsCallable(functions, 'getFreshersCount');
+
+        getFreshersCount()
+            .then((result) => {
+                setFreshersCount(result.data.count);
+            })
+            .catch((error) => {
+                console.error("Error fetching freshers count:", error);
+            });
     }, []);
 
-    // Fetch courses count in real-time
+    // Fetch courses count using Cloud Function
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, 'courses'), (snapshot) => {
-            setCoursesCount(snapshot.size);
-        });
-        return () => unsubscribe();
+        const functions = getFunctions();
+        const getCoursesCount = httpsCallable(functions, 'getCoursesCount');
+
+        getCoursesCount()
+            .then((result) => {
+                setCoursesCount(result.data.count);
+            })
+            .catch((error) => {
+                console.error("Error fetching courses count:", error);
+            });
     }, []);
 
-    // Fetch submissions count in real-time (assuming a 'submissions' collection)
+    // Fetch submissions count using Cloud Function
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, 'submissions'), (snapshot) => {
-            setSubmissionsCount(snapshot.size);
-        });
-        return () => unsubscribe();
+        const functions = getFunctions();
+        const getSubmissionsCount = httpsCallable(functions, 'getSubmissionsCount');
+
+        getSubmissionsCount()
+            .then((result) => {
+                setSubmissionsCount(result.data.count);
+            })
+            .catch((error) => {
+                console.error("Error fetching submissions count:", error);
+            });
     }, []);
 
-    // Fetch active users count in real-time (counting all users for now)
+    // Fetch active users count using Cloud Function
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
-            setActiveUsersCount(snapshot.size);
-        });
-        return () => unsubscribe();
+        const functions = getFunctions();
+        const getActiveUsersCount = httpsCallable(functions, 'getActiveUsersCount');
+
+        getActiveUsersCount()
+            .then((result) => {
+                setActiveUsersCount(result.data.count);
+            })
+            .catch((error) => {
+                console.error("Error fetching active users count:", error);
+            });
     }, []);
 
     // Sample data for department progression
