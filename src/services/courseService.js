@@ -125,6 +125,20 @@ export const courseService = {
         const q = query(usersRef, where('role', '==', 'fresher'), where('departmentId', '==', departmentId));
         const snapshot = await getDocs(q);
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    },
+
+    async markCourseAsCompleted(fresherId, courseId) {
+        try {
+            const courseRef = doc(db, 'users', fresherId, 'courses', courseId);
+            await updateDoc(courseRef, {
+                status: 'completed',
+                updatedAt: new Date()
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('Error marking course as completed:', error);
+            throw error;
+        }
     }
 };
 

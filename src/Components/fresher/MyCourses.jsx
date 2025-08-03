@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db, auth } from '../../firebase';
 import {
     collection,
@@ -12,8 +13,8 @@ import '../../Style/MyCourses.css';
 const MyCourses = () => {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCourse, setSelectedCourse] = useState(null);
     const [user, setUser] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -42,6 +43,10 @@ const MyCourses = () => {
         return () => unsubscribeAuth();
     }, []);
 
+    const handleCourseClick = (courseId) => {
+        navigate(`/fresher/course/${courseId}`);
+    };
+
     if (loading) {
         return (
             <div className="loading-container">
@@ -67,42 +72,24 @@ const MyCourses = () => {
             ) : (
                 <div className="courses-grid">
                     {courses.map(course => (
-                        <div key={course.id} className="course-card" onClick={() => setSelectedCourse(course)}>
+                        <div key={course.id} className={`course-card ${course.completed ? 'completed-course' : ''}`} onClick={() => handleCourseClick(course.id)}>
                             <div className="course-thumbnail">
                                 <img src={course.thumbnailUrl || 'https://via.placeholder.com/300x150'} alt={`${course.title} thumbnail`} />
                             </div>
                             <div className="course-content">
                                 <h3 className="course-title">{course.title}</h3>
                                 <p className="course-instructor">by {course.instructor}</p>
+                                {course.progress !== undefined && (
+                                    <div className="course-progress">
+                                        <div className="progress-bar-container">
+                                            <div className="progress-bar" style={{ width: `${course.progress}%` }}></div>
+                                        </div>
+                                        <span className="progress-text">{Math.round(course.progress)}% Completed</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
-
-            {selectedCourse && (
-                <div className="modal-overlay" onClick={() => setSelectedCourse(null)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>{selectedCourse.title}</h3>
-                            <button className="close-btn" onClick={() => setSelectedCourse(null)}>×</button>
-                        </div>
-                        <div className="modal-body">
-                            <p className="course-description">{selectedCourse.description}</p>
-                            <div className="lectures-list">
-                                {selectedCourse.lectures?.map(lecture => (
-                                    <div key={lecture.id} className="lecture-item">
-                                        <h4>{lecture.title}</h4>
-                                        <p>{lecture.description}</p>
-                                        <video controls width="100%">
-                                            <source src={lecture.videoUrl} type="video/mp4" />
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

@@ -18,6 +18,12 @@ const ViewFresherDashboard = () => {
     useEffect(() => {
         const fetchFresher = async () => {
             setLoading(true);
+            if (!id) {
+                console.error("Fresher ID is undefined.");
+                setFresher(null);
+                setLoading(false);
+                return;
+            }
             try {
                 const docRef = doc(db, 'users', id);
                 const docSnap = await getDoc(docRef);

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../../Style/FresherSearch.css';
 import { auth, db } from '../../firebase';
 import { getIdToken } from 'firebase/auth';
-import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import CsvUpload from './CsvUpload';
 import { courseService } from '../../services/courseService'; // Import courseService
@@ -87,6 +87,33 @@ const FresherSearch = ({ onAddFresher }) => {
         }
     };
 
+    const handleResetProgress = async (fresherId) => {
+        if (window.confirm("Are you sure you want to reset progress for ALL courses for this fresher?")) {
+            try {
+                const coursesRef = collection(db, 'users', fresherId, 'courses');
+                const coursesSnapshot = await getDocs(coursesRef);
+                
+                const batchUpdates = [];
+                coursesSnapshot.forEach((courseDoc) => {
+                    const courseDocRef = doc(db, 'users', fresherId, 'courses', courseDoc.id);
+                    batchUpdates.push(updateDoc(courseDocRef, {
+                        currentLectureIndex: 0,
+                        progress: 0,
+                        completed: false
+                    }));
+                });
+
+                await Promise.all(batchUpdates);
+                alert("All course progress reset successfully for this fresher!");
+                // Optionally, re-run search to update UI
+                handleSearch();
+            } catch (error) {
+                console.error("Error resetting fresher progress:", error);
+                alert("Failed to reset fresher progress.");
+            }
+        }
+    };
+
     return (
         <div className="fresher-container">
             <div className="card-box">
@@ -126,6 +153,7 @@ const FresherSearch = ({ onAddFresher }) => {
                                 <div style={{marginBottom: 4}}><strong>Status:</strong> {f.status || '-'}</div>
                                 <div style={{marginBottom: 8}}><strong>Start Date:</strong> {f.startDate || '-'}</div>
                                 <button onClick={() => navigate(`/admin/fresher/${f.id}`)} style={{background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer'}}>View</button>
+                                <button onClick={() => handleResetProgress(f.id)} style={{background: '#dc3545', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer', marginLeft: '10px'}}>Reset Progress</button>
                             </div>
                         ))}
                     </div>
