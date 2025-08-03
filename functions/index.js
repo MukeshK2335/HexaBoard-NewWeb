@@ -112,7 +112,7 @@ exports.uploadFreshers = functions.https.onRequest((req, res) => {
                             });
 
                             // Send welcome email with generated password and user ID
-                            await sendWelcomeEmail(user.email, user.name, userRecord.uid, password);
+                            await sendWelcomeEmail(user.email, user.name, user.email, password);
 
                             success.push({ email: user.email });
                         } catch (err) {
@@ -182,7 +182,7 @@ exports.addFresher = functions.https.onRequest(async (req, res) => {
             });
 
             // Send welcome email with generated password and user ID
-            await sendWelcomeEmail(email, name, userRecord.uid, password);
+            await sendWelcomeEmail(email, name, email, password);
 
             res.status(200).json({ success: true, userId: userRecord.uid, password: password });
         } catch (error) {
