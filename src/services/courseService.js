@@ -15,6 +15,17 @@ import {
     setDoc
 } from 'firebase/firestore';
 
+// Helper function to generate a random password
+function generatePassword(length = 10) {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+    }
+    return password;
+}
+
 export const courseService = {
     async uploadFile(file, path) {
         const storageRef = ref(storage, path);
@@ -138,6 +149,41 @@ export const courseService = {
         } catch (error) {
             console.error('Error marking course as completed:', error);
             throw error;
+        }
+    },
+
+    // New function to handle fresher addition and email sending via Cloud Function
+    async addFresherWithDepartmentAssignment(fresherData) {
+        try {
+            const password = generatePassword(); // Generate a random password
+
+            // Helper to remove undefined values from an object
+            const removeUndefined = (obj) => {
+                return Object.fromEntries(
+                    Object.entries(obj).filter(([, v]) => v !== undefined)
+                );
+            };
+
+            const cleanedFresherData = removeUndefined(fresherData);
+
+            const response = await fetch('https://addfresher-w7bmdisz2q-uc.a.run.app/addFresher', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ...cleanedFresherData, password }), // Pass the generated password
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                return { success: true, email: fresherData.email, password: result.password };
+            } else {
+                return { success: false, error: result.error || 'Unknown error' };
+            }
+        } catch (error) {
+            console.error('Error in addFresherWithDepartmentAssignment:', error);
+            return { success: false, error: error.message };
         }
     }
 };

@@ -31,6 +31,7 @@ const FresherSearch = ({ onAddFresher }) => {
         }
 
         try {
+            console.log("Sending fresher data:", newFresher);
             const result = await courseService.addFresherWithDepartmentAssignment(newFresher);
             if (result.success) {
                 alert(`Fresher ${result.email} added successfully! Password: ${result.password}`);

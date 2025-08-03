@@ -1,10 +1,13 @@
+/* eslint-env node */
+/* global module, exports */
+
 module.exports = {
   env: {
-    es2020: true, // Use a more modern ECMAScript version
+    es2020: true,
     node: true,
   },
   parserOptions: {
-    ecmaVersion: 2020, // Match the env
+    ecmaVersion: 2020,
   },
   extends: [
     "eslint:recommended",
@@ -14,12 +17,12 @@ module.exports = {
     "no-restricted-globals": ["error", "name", "length"],
     "prefer-arrow-callback": "error",
     "quotes": ["error", "double", { "allowTemplateLiterals": true }],
-    "indent": ["error", 2], // Enforce 2-space indentation
-    "max-len": ["error", { "code": 120 }], // Increase max line length
-    "object-curly-spacing": ["error", "always"], // Enforce spacing in object literals
-    "require-jsdoc": "off", // Disable JSDoc requirement
-    "valid-jsdoc": "off", // Disable JSDoc validation
-    "no-unused-vars": ["warn"], // Warn about unused variables instead of erroring
+    "indent": ["error", 2],
+    "max-len": ["error", { "code": 120 }],
+    "object-curly-spacing": ["error", "always"],
+    "require-jsdoc": "off",
+    "valid-jsdoc": "off",
+    "no-unused-vars": ["warn"],
   },
   overrides: [
     {

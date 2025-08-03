@@ -3,26 +3,25 @@ const admin = require("firebase-admin");
 const csv = require("csv-parser");
 const Busboy = require("busboy");
 const stream = require("stream");
+const cors = require('cors')({ origin: true });
 
 admin.initializeApp();
-
-// Limit concurrent containers
-functions.runWith({ maxInstances: 10 });
-
-
+const db = admin.firestore();
+db.settings({ ignoreUndefinedProperties: true });
 
 // Function to send a welcome email using SendGrid
-async function sendWelcomeEmail(email, name, passwordResetLink) {
+async function sendWelcomeEmail(email, name, userId, password) {
     try {
         await admin.firestore().collection('mail').add({ // 'mail' is the default collection, change if you configured differently
             to: email,
             message: {
-                subject: 'Welcome to HexaBoard - Set Your Password!',
+                subject: 'Welcome to HexaBoard - Your Account Details!',
                 html: `
                     <p>Hello ${name},</p>
-                    <p>Your account has been created for HexaBoard. Please click the link below to set your password and log in:</p>
-                    <p><a href="${passwordResetLink}">Set Your Password</a></p>
-                    <p>If you did not request this, please ignore this email.</p>
+                    <p>Your account has been created for HexaBoard. Here are your login details:</p>
+                    <p><strong>User ID:</strong> ${userId}</p>
+                    <p><strong>Password:</strong> ${password}</p>
+                    <p>Please keep this information secure.</p>
                     <p>Thank you,<br>The HexaBoard Team</p>
                 `,
             },
@@ -58,124 +57,137 @@ async function findOrCreateDepartment(departmentName) {
 }
 
 exports.uploadFreshers = functions.https.onRequest((req, res) => {
-    if (req.method !== "POST") {
-        return res.status(405).send("Method Not Allowed");
-    }
+    cors(req, res, async () => {
+        if (req.method !== "POST") {
+            return res.status(405).send("Method Not Allowed");
+        }
 
-    const busboy = new Busboy({ headers: req.headers });
-    const users = [];
+        const busboy = new Busboy({ headers: req.headers });
+        const users = [];
 
-    busboy.on("file", (fieldname, file, filename) => {
-        const bufferStream = new stream.PassThrough();
-        file.pipe(bufferStream);
+        busboy.on("file", (fieldname, file, filename) => {
+            const bufferStream = new stream.PassThrough();
+            file.pipe(bufferStream);
 
-        bufferStream
-            .pipe(csv())
-            .on("data", (row) => {
-                if (row.email && row.name && row.department) { // Ensure department is present
-                    users.push({
-                        email: row.email.trim(),
-                        name: row.name.trim(),
-                        role: row.role?.trim() || "fresher",
-                        departmentName: row.department.trim(), // Use departmentName from CSV
-                    });
-                }
-            })
-            .on("end", async () => {
-                const success = [];
-                const failed = [];
-
-                for (const user of users) {
-                    const password = generatePassword();
-                    try {
-                        // Find or create department
-                        const department = await findOrCreateDepartment(user.departmentName);
-
-                        const userRecord = await admin.auth().createUser({
-                            email: user.email,
-                            password,
-                            displayName: user.name,
+            bufferStream
+                .pipe(csv())
+                .on("data", (row) => {
+                    if (row.email && row.name && row.department) { // Ensure department is present
+                        users.push({
+                            email: row.email.trim(),
+                            name: row.name.trim(),
+                            role: row.role?.trim() || "fresher",
+                            departmentName: row.department.trim(), // Use departmentName from CSV
                         });
-
-                        await admin.firestore().collection("users").doc(userRecord.uid).set({
-                            name: user.name,
-                            email: user.email,
-                            role: user.role,
-                            departmentId: department.id, // Assign department ID
-                            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                        });
-
-                        // Increment department member count
-                        await admin.firestore().collection("departments").doc(department.id).update({
-                            memberCount: admin.firestore.FieldValue.increment(1),
-                            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-                        });
-
-                        // Generate password reset link
-                        const passwordResetLink = await admin.auth().generatePasswordResetLink(user.email);
-
-                        // Send welcome email
-                        await sendWelcomeEmail(user.email, user.name, passwordResetLink);
-
-                        success.push({ email: user.email });
-                    } catch (err) {
-                        failed.push({ email: user.email, error: err.message });
                     }
-                }
+                })
+                .on("end", async () => {
+                    const success = [];
+                    const failed = [];
 
-                res.status(200).json({ success, failed });
-            });
+                    for (const user of users) {
+                        const password = generatePassword();
+                        try {
+                            // Find or create department
+                            const department = await findOrCreateDepartment(user.departmentName);
+
+                            const userRecord = await admin.auth().createUser({
+                                email: user.email,
+                                password,
+                                displayName: user.name,
+                            });
+
+                            await admin.firestore().collection("users").doc(userRecord.uid).set({
+                                name: user.name,
+                                email: user.email,
+                                role: user.role,
+                                departmentId: department.id, // Assign department ID
+                                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                            });
+
+                            // Increment department member count
+                            await admin.firestore().collection("departments").doc(department.id).update({
+                                memberCount: admin.firestore.FieldValue.increment(1),
+                                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                            });
+
+                            // Send welcome email with generated password and user ID
+                            await sendWelcomeEmail(user.email, user.name, userRecord.uid, password);
+
+                            success.push({ email: user.email });
+                        } catch (err) {
+                            failed.push({ email: user.email, error: err.message });
+                        }
+                    }
+
+                    res.status(200).json({ success, failed });
+                });
+        });
+
+        busboy.on("finish", () => {
+            // No-op: handled in 'end' above
+        });
+
+        req.pipe(busboy);
     });
-
-    busboy.on("finish", () => {
-        // No-op: handled in 'end' above
-    });
-
-    req.pipe(busboy);
 });
+
+function generatePassword(length = 10) {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+    }
+    return password;
+}
 
 exports.addFresher = functions.https.onRequest(async (req, res) => {
-    if (req.method !== "POST") {
-        return res.status(405).send("Method Not Allowed");
-    }
+    cors(req, res, async () => {
+        if (req.method !== "POST") {
+            return res.status(405).send("Method Not Allowed");
+        }
 
-    const { name, email, department: departmentName, startDate } = req.body; // Get departmentName
+        const { name, email, departmentName, startDate } = req.body; // Get departmentName
 
-    try {
-        // Find or create department
-        const department = await findOrCreateDepartment(departmentName);
+        if (!departmentName) {
+            return res.status(400).json({ success: false, error: "Department name is required." });
+        }
 
-        const userRecord = await admin.auth().createUser({
-            email,
-            // No initial password needed, user sets it via reset link
-            displayName: name,
-        });
+        try {
+            // Find or create department
+            const department = await findOrCreateDepartment(departmentName);
 
-        await admin.firestore().collection("users").doc(userRecord.uid).set({
-            name,
-            email,
-            departmentId: department.id, // Assign department ID
-            startDate,
-            role: "fresher",
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+            const password = generatePassword(); // Generate a random password
 
-        // Increment department member count
-        await admin.firestore().collection("departments").doc(department.id).update({
-            memberCount: admin.firestore.FieldValue.increment(1),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+            const userRecord = await admin.auth().createUser({
+                email,
+                password, // Set the generated password
+                displayName: name,
+            });
 
-        // Generate password reset link
-        const passwordResetLink = await admin.auth().generatePasswordResetLink(email);
+            await admin.firestore().collection("users").doc(userRecord.uid).set({
+                name,
+                email,
+                departmentId: department.id, // Assign department ID
+                startDate: startDate || null, // Set to null if undefined
+                role: "fresher",
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
 
-        // Send welcome email with password reset link
-        await sendWelcomeEmail(email, name, passwordResetLink);
+            // Increment department member count
+            await admin.firestore().collection("departments").doc(department.id).update({
+                memberCount: admin.firestore.FieldValue.increment(1),
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
 
-        res.status(200).json({ success: true });
-    } catch (error) {
-        console.error("Error adding fresher:", error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+            // Send welcome email with generated password and user ID
+            await sendWelcomeEmail(email, name, userRecord.uid, password);
+
+            res.status(200).json({ success: true, userId: userRecord.uid, password: password });
+        } catch (error) {
+            console.error("Error adding fresher:", error);
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
 });
-
