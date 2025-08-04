@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../../firebase';
 import { 
     collection, 
@@ -15,6 +16,10 @@ import { FileText, Plus, Edit, Trash2, Clock, CheckCircle } from 'lucide-react';
 import '../../Style/AssessmentManager.css';
 
 const AssessmentManager = () => {
+<<<<<<< HEAD
+=======
+    const navigate = useNavigate();
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
     const [assessments, setAssessments] = useState([]);
     const [courses, setCourses] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -351,6 +356,15 @@ const AssessmentManager = () => {
                             >
                                 <Trash2 size={16} /> Delete
                             </button>
+<<<<<<< HEAD
+=======
+                            <button 
+                                className="take-assessment-btn"
+                                onClick={() => navigate(`/take-assessment/${assessment.id}`)}
+                            >
+                                Take Assessment
+                            </button>
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                         </div>
                     </div>
                 ))}

@@ -6,6 +6,29 @@
     font-family: 'Inter', sans-serif;
 }
 
+.fresher-course-player.sidebar-hidden {
+    grid-template-columns: 1fr; /* Main content takes full width when sidebar is hidden */
+}
+
+.toggle-sidebar-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-sidebar-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
 .video-player-section {
     background-color: #1a1a1a;
     display: flex;
@@ -182,3 +205,42 @@
     font-size: 1.2rem;
     padding: 50px;
 }
+
+.notification-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background-color: white;
+    color: #333;
+    padding: 30px 50px;
+    border-radius: 15px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: cardPopIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards, fadeOut 0.5s 2.5s forwards;
+}
+
+@keyframes cardPopIn {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+

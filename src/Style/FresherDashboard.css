@@ -20,6 +20,23 @@ body {
     width: 100%;
 }
 
+.layout-wrapper.sidebar-hidden .sidebar {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+.layout-wrapper.sidebar-hidden .sidebar .logo,
+.layout-wrapper.sidebar-hidden .sidebar .nav-links {
+    display: none;
+}
+
+.layout-wrapper.sidebar-hidden .main-content {
+    margin-left: 0;
+    width: 100%;
+}
+
 @media (max-width: 768px) {
     .layout-wrapper {
         flex-direction: column;
@@ -34,6 +51,14 @@ body {
     display: flex;
     flex-direction: column;
     padding: 24px 16px;
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+.main-content {
+    flex: 1;
+    padding: 24px 40px;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 .logo {

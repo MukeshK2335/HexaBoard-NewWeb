@@ -75,6 +75,11 @@ export const chatbotService = {
             const result = await model.generateContent(message);
             const response = await result.response;
             const text = response.text();
+<<<<<<< HEAD
+=======
+            console.log("Gemini API raw text response:", text);
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
+            console.log("Gemini API raw text response:", text);
             return text;
         } catch (error) {
             console.error("Gemini API Error:", error);

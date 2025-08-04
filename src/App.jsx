@@ -9,6 +9,7 @@ import FresherLearning from './Components/fresher/FresherLearning.jsx';
 import CourseDetailView from './Components/fresher/CourseDetailView.jsx';
 import FresherCoursePlayer from './Components/fresher/FresherCoursePlayer.jsx';
 import MyCourses from './Components/fresher/MyCourses.jsx';
+import AssessmentPage from './Components/assessments/AssessmentPage.jsx';
 import './App.css';
 
 function App() {
@@ -77,6 +78,16 @@ function App() {
                     </ProtectedRoute>
                 } />
 
+<<<<<<< HEAD
+=======
+                {/* Assessment Page */}
+                <Route path="/take-assessment/:assessmentId" element={
+                    <ProtectedRoute>
+                        <AssessmentPage />
+                    </ProtectedRoute>
+                } />
+
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
             </Routes>
         </Router>
     );

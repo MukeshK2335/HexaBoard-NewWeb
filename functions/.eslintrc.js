@@ -36,5 +36,6 @@ module.exports = {
   globals: {
     module: true,
     exports: true,
+    require: true,
   },
 };

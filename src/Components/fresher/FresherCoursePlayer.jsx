@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db, auth } from '../../firebase';
-import { doc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
+<<<<<<< HEAD
+import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, increment } from 'firebase/firestore';
+=======
+import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, increment } from 'firebase/firestore';
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
 import { onAuthStateChanged } from 'firebase/auth';
 import '../../Style/FresherCoursePlayer.css';
 
@@ -13,6 +17,11 @@ const FresherCoursePlayer = () => {
     const [progress, setProgress] = useState(0); // New state for progress
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
+<<<<<<< HEAD
+=======
+    const [notification, setNotification] = useState({ show: false, message: '' });
+    const [isSidebarHidden, setIsSidebarHidden] = useState(false);
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
 
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
@@ -83,6 +92,7 @@ const FresherCoursePlayer = () => {
                     progress: 100,
                     completed: true
                 });
+<<<<<<< HEAD
                 alert('Course Finished and Progress Saved!');
                 // Create a new assignment for the completed course
                 const assignmentsCollectionRef = collection(db, 'users', user.uid, 'assignments');
@@ -99,6 +109,48 @@ const FresherCoursePlayer = () => {
             } catch (error) {
                 console.error("Error marking course as finished or creating assignment:", error);
                 alert('Failed to mark course as finished or create assignment. Please try again.');
+=======
+
+                // Show completion message
+                setNotification({ show: true, message: 'Congratulations! You have completed this course.' });
+
+                // Wait for a moment, then show the assignment message
+                setTimeout(async () => {
+                    const assignmentsCollectionRef = collection(db, 'users', user.uid, 'assignments');
+                    const q = query(assignmentsCollectionRef, where('courseId', '==', course.id));
+                    const querySnapshot = await getDocs(q);
+
+                    if (querySnapshot.empty) {
+                        await addDoc(assignmentsCollectionRef, {
+                            courseId: course.id,
+                            courseTitle: course.title,
+                            status: 'pending',
+                            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Due in 7 days
+                            createdAt: new Date(),
+                        });
+                        setNotification({ show: true, message: 'You have unlocked an assignment for this course!' });
+
+                        // Increment completedCoursesCount for the user
+                        const userDocRef = doc(db, 'users', user.uid);
+                        await updateDoc(userDocRef, {
+                            completedCoursesCount: increment(1)
+                        });
+                    } else {
+                        setNotification({ show: true, message: 'Assignment for this course already exists!' });
+                    }
+
+                    // Wait again before redirecting
+                    setTimeout(() => {
+                        navigate('/fresher/dashboard', { state: { activeTab: 'assignments' } });
+                    }, 3000); // Adjust delay as needed
+
+                }, 3000); // Adjust delay as needed
+
+            } catch (error) {
+                console.error("Error marking course as finished or creating assignment:", error);
+                setNotification({ show: true, message: 'Failed to update course. Please try again.' });
+                setTimeout(() => setNotification({ show: false, message: '' }), 3000);
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
             }
         }
     };
@@ -119,8 +171,21 @@ const FresherCoursePlayer = () => {
     const currentLecture = course.lectures[currentLectureIndex];
 
     return (
+<<<<<<< HEAD
         <div className="fresher-course-player">
             <div className="video-player-section">
+=======
+        <div className={`fresher-course-player ${isSidebarHidden ? 'sidebar-hidden' : ''}`}>
+             {notification.show && (
+                <div className="notification-animation">
+                    {notification.message}
+                </div>
+            )}
+            <div className="video-player-section">
+                <button className="toggle-sidebar-btn" onClick={() => setIsSidebarHidden(!isSidebarHidden)}>
+                    {isSidebarHidden ? 'Show Sidebar' : 'Hide Sidebar'}
+                </button>
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                 {currentLecture && currentLecture.videoUrl ? (
                     <video controls autoPlay key={currentLecture.videoUrl} className="main-video-player">
                         <source src={currentLecture.videoUrl} type="video/mp4" />
@@ -149,6 +214,7 @@ const FresherCoursePlayer = () => {
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div className="course-sidebar">
                 <h3>{course.title}</h3>
                 <div className="lectures-list">
@@ -163,6 +229,24 @@ const FresherCoursePlayer = () => {
                     ))}
                 </div>
             </div>
+=======
+            {!isSidebarHidden && (
+                <div className="course-sidebar">
+                    <h3>{course.title}</h3>
+                    <div className="lectures-list">
+                        {course.lectures.map((lecture, index) => (
+                            <div 
+                                key={lecture.id || index} 
+                                className={`sidebar-lecture-item ${index === currentLectureIndex ? 'active' : ''}`}
+                                onClick={() => setCurrentLectureIndex(index)}
+                            >
+                                <span>{index + 1}. {lecture.title}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
         </div>
     );
 };

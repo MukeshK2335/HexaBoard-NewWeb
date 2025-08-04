@@ -18,162 +18,19 @@ function formatDate(ts) {
     return '';
 }
 
-// Course data with Udemy-style content
-const courseData = [
-    {
-        id: 1,
-        title: "Complete Web Development Bootcamp 2024",
-        subtitle: "Learn HTML, CSS, JavaScript, React, Node.js, MongoDB and more!",
-        instructor: "Sarah Johnson",
-        instructorTitle: "Full Stack Developer & Instructor",
-        instructorImage: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-        rating: 4.7,
-        totalRatings: 15420,
-        studentsEnrolled: 125000,
-        originalPrice: 199.99,
-        currentPrice: 89.99,
-        duration: "42.5 hours",
-        lectures: 385,
-        level: "All Levels",
-        language: "English",
-        lastUpdated: "December 2023",
-        certificate: true,
-        progress: 75,
-        status: "In Progress",
-        thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=225&fit=crop",
-        modules: [
-            {
-                id: 1,
-                title: "HTML & CSS Fundamentals",
-                lessons: [
-                    { id: 1, title: "Introduction to HTML", duration: "45 min", completed: true, progress: 100 },
-                    { id: 2, title: "CSS Styling & Layout", duration: "60 min", completed: true, progress: 100 },
-                    { id: 3, title: "Responsive Design Principles", duration: "90 min", completed: false, progress: 60 },
-                    { id: 4, title: "CSS Grid & Flexbox Mastery", duration: "75 min", completed: false, progress: 0 }
-                ],
-                progress: 65
-            },
-            {
-                id: 2,
-                title: "JavaScript Programming",
-                lessons: [
-                    { id: 5, title: "Variables & Data Types", duration: "50 min", completed: true, progress: 100 },
-                    { id: 6, title: "Functions & Scope", duration: "65 min", completed: true, progress: 100 },
-                    { id: 7, title: "DOM Manipulation", duration: "80 min", completed: false, progress: 30 },
-                    { id: 8, title: "Event Handling & AJAX", duration: "70 min", completed: false, progress: 0 }
-                ],
-                progress: 58
-            },
-            {
-                id: 3,
-                title: "React Development",
-                lessons: [
-                    { id: 9, title: "Introduction to React", duration: "90 min", completed: false, progress: 0 },
-                    { id: 10, title: "Components & Props", duration: "75 min", completed: false, progress: 0 },
-                    { id: 11, title: "State Management", duration: "85 min", completed: false, progress: 0 },
-                    { id: 12, title: "Hooks & Lifecycle", duration: "95 min", completed: false, progress: 0 }
-                ],
-                progress: 0
-            }
-        ]
-    },
-    {
-        id: 2,
-        title: "Data Science & Machine Learning Masterclass",
-        subtitle: "Master Python, NumPy, Pandas, Scikit-learn, TensorFlow and more!",
-        instructor: "Dr. Michael Chen",
-        instructorTitle: "Senior Data Scientist at Google",
-        instructorImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        rating: 4.8,
-        totalRatings: 8920,
-        studentsEnrolled: 89000,
-        originalPrice: 299.99,
-        currentPrice: 129.99,
-        duration: "58.5 hours",
-        lectures: 425,
-        level: "Intermediate",
-        language: "English",
-        lastUpdated: "January 2024",
-        certificate: true,
-        progress: 45,
-        status: "In Progress",
-        thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=225&fit=crop",
-        modules: [
-            {
-                id: 1,
-                title: "Python for Data Science",
-                lessons: [
-                    { id: 1, title: "Python Basics & Setup", duration: "60 min", completed: true, progress: 100 },
-                    { id: 2, title: "NumPy & Pandas Mastery", duration: "90 min", completed: true, progress: 100 },
-                    { id: 3, title: "Data Visualization with Matplotlib", duration: "75 min", completed: false, progress: 80 },
-                    { id: 4, title: "Statistical Analysis", duration: "85 min", completed: false, progress: 0 }
-                ],
-                progress: 70
-            },
-            {
-                id: 2,
-                title: "Machine Learning Fundamentals",
-                lessons: [
-                    { id: 5, title: "Supervised Learning Algorithms", duration: "100 min", completed: false, progress: 0 },
-                    { id: 6, title: "Unsupervised Learning", duration: "95 min", completed: false, progress: 0 },
-                    { id: 7, title: "Model Evaluation & Validation", duration: "80 min", completed: false, progress: 0 },
-                    { id: 8, title: "Feature Engineering", duration: "90 min", completed: false, progress: 0 }
-                ],
-                progress: 0
-            }
-        ]
-    },
-    {
-        id: 3,
-        title: "Digital Marketing & Social Media Strategy",
-        subtitle: "Learn SEO, SEM, Social Media Marketing, Email Marketing and more!",
-        instructor: "Emma Rodriguez",
-        instructorTitle: "Digital Marketing Expert & Consultant",
-        instructorImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        rating: 4.6,
-        totalRatings: 6230,
-        studentsEnrolled: 67000,
-        originalPrice: 149.99,
-        currentPrice: 69.99,
-        duration: "28.5 hours",
-        lectures: 245,
-        level: "Beginner",
-        language: "English",
-        lastUpdated: "November 2023",
-        certificate: true,
-        progress: 20,
-        status: "Just Started",
-        thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=225&fit=crop",
-        modules: [
-            {
-                id: 1,
-                title: "Marketing Fundamentals",
-                lessons: [
-                    { id: 1, title: "Marketing Principles & Strategy", duration: "45 min", completed: true, progress: 100 },
-                    { id: 2, title: "Target Audience Analysis", duration: "60 min", completed: false, progress: 40 },
-                    { id: 3, title: "Brand Positioning & Messaging", duration: "70 min", completed: false, progress: 0 },
-                    { id: 4, title: "Marketing Mix & 4Ps", duration: "65 min", completed: false, progress: 0 }
-                ],
-                progress: 35
-            },
-            {
-                id: 2,
-                title: "Digital Marketing Channels",
-                lessons: [
-                    { id: 5, title: "Social Media Marketing", duration: "80 min", completed: false, progress: 0 },
-                    { id: 6, title: "Email Marketing Campaigns", duration: "75 min", completed: false, progress: 0 },
-                    { id: 7, title: "Content Marketing Strategy", duration: "85 min", completed: false, progress: 0 },
-                    { id: 8, title: "SEO & SEM Optimization", duration: "90 min", completed: false, progress: 0 }
-                ],
-                progress: 0
-            }
-        ]
-    }
-];
+<<<<<<< HEAD
+const Dashboard = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [data, setData] = useState({ activeCourses: 0, pendingAssignments: 0, completed: 0, pendingCourses: 0, completedCourses: 0 });
+=======
+
 
 const Dashboard = () => {
+    const navigate = useNavigate();
     const location = useLocation();
-    const [data, setData] = useState({ activeCourses: 0, pendingAssignments: 0, completed: 0 });
+    const [data, setData] = useState({ activeCourses: 0, pendingAssignments: 0, completed: 0, pendingCourses: 0, completedCourses: 0 });
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
     const [userName, setUserName] = useState("...");
     const [certifications, setCertifications] = useState([]);
     const [assignments, setAssignments] = useState([]); // New state for assignments
@@ -190,6 +47,7 @@ const Dashboard = () => {
             try {
                 setLoading(true);
                 setError(null);
+<<<<<<< HEAD
                 console.log("onAuthStateChanged fired. User:", user);
                 if (user) {
                     // Fetch user profile data
@@ -237,10 +95,29 @@ const Dashboard = () => {
 
                     // Fetch assignments
                     try {
+=======
+                if (user) {
+                    const docRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(docRef);
+
+                    if (userSnap.exists()) {
+                        const userData = userSnap.data();
+                        setUserName(userData.name || "Fresher");
+
+                        // Fetch user's courses from Firestore
+                        const userCoursesRef = collection(db, "users", user.uid, "courses");
+                        const userCoursesSnap = await getDocs(userCoursesRef);
+                        const userCoursesList = userCoursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                        const activeCoursesCount = userCoursesList.filter(course => !course.completed).length;
+                        const completedCoursesCount = userCoursesList.filter(course => course.completed).length;
+
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                         const assignmentsRef = collection(db, "users", user.uid, "assignments");
                         const assignmentsSnap = await getDocs(assignmentsRef);
                         const assignmentsList = assignmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                         setAssignments(assignmentsList);
+<<<<<<< HEAD
                         console.log("Fetched assignments:", assignmentsList);
                     } catch (assignmentErr) {
                         console.error("Error loading assignments:", assignmentErr);
@@ -250,6 +127,37 @@ const Dashboard = () => {
                 } else {
                     setError("No user is logged in.");
                     console.error("No user is logged in.");
+=======
+
+                        const certRef = collection(db, "users", user.uid, "certifications");
+                        const certSnap = await getDocs(certRef);
+                        const certs = certSnap.docs.map(doc => doc.data());
+                        setCertifications(certs);
+
+                        const progressRef = collection(db, "users", user.uid, "progress");
+                        const progressSnap = await getDocs(progressRef);
+                        const progressArr = progressSnap.docs.map(doc => doc.data());
+                        const filtered = progressArr.filter(p => p.date && typeof p.progress === 'number');
+                        filtered.sort((a, b) => (a.date > b.date ? 1 : -1));
+                        setProgressData(filtered);
+
+                        const pendingAssignments = assignmentsList.filter(a => a.status !== 'Completed').length;
+                        const completedAssignments = assignmentsList.length - pendingAssignments;
+
+                        setData({
+                            activeCourses: activeCoursesCount,
+                            pendingAssignments: pendingAssignments,
+                            completedCourses: completedCoursesCount,
+                            completed: completedAssignments,
+                            pendingCourses: userCoursesList.filter(course => !course.completed && course.progress === 0).length,
+                        });
+                    } else {
+                        setError("User profile not found.");
+                        setUserName("Fresher");
+                    }
+                } else {
+                    setError("No user is logged in.");
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                 }
             } catch (err) {
                 console.error("Error loading user data:", err);
@@ -362,8 +270,13 @@ const Dashboard = () => {
                     <p className="count">{data.pendingAssignments}</p>
                 </div>
                 <div className="card">
+<<<<<<< HEAD
                     <h4>Completed</h4>
                     <p className="count">{data.completed}</p>
+=======
+                    <h4>Completed Courses</h4>
+                    <p className="count">{data.completedCourses}</p>
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                 </div>
             </section>
 
@@ -425,7 +338,11 @@ const Dashboard = () => {
                             {assignment.dueDate && <p>Due: {formatDate(assignment.dueDate)}</p>}
                             <button 
                                 className="take-assessment-btn"
+<<<<<<< HEAD
                                 onClick={() => navigate(`/fresher/assessment/${assignment.id}`)} // Placeholder navigation
+=======
+                                onClick={() => navigate(`/take-assessment/${assignment.courseId}`)} // Navigate using courseId
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                             >
                                 Take Assessment
                             </button>
@@ -454,7 +371,11 @@ const Dashboard = () => {
 
             {/* Course Grid */}
             <section className="course-grid">
+<<<<<<< HEAD
                 {courseData.map((course) => (
+=======
+                {/* courseData.map((course) => (
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                     <div key={course.id} className="course-card" onClick={() => setSelectedCourse(course)}>
                         <div className="course-thumbnail">
                             <img src={course.thumbnail} alt={course.title} />
@@ -512,7 +433,11 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
+<<<<<<< HEAD
                 ))}
+=======
+                ))} */}
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
             </section>
 
             {/* Course Detail Modal */}
@@ -627,7 +552,11 @@ const Dashboard = () => {
                         >
                             My Courses
                         </a>
+<<<<<<< HEAD
                         <a href="#">Schedule</a>
+=======
+                        <a href="#">Daily Quiz</a>
+>>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                         <a 
                             href="#" 
                             className={activeTab === 'assignments' ? 'active' : ''} 
