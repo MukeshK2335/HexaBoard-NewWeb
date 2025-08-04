@@ -78,16 +78,12 @@ function App() {
                     </ProtectedRoute>
                 } />
 
-<<<<<<< HEAD
-=======
                 {/* Assessment Page */}
                 <Route path="/take-assessment/:assessmentId" element={
                     <ProtectedRoute>
                         <AssessmentPage />
                     </ProtectedRoute>
                 } />
-
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
             </Routes>
         </Router>
     );

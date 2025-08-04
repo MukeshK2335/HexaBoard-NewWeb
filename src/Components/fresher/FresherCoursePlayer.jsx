@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db, auth } from '../../firebase';
-<<<<<<< HEAD
 import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, increment } from 'firebase/firestore';
-=======
-import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, increment } from 'firebase/firestore';
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
 import { onAuthStateChanged } from 'firebase/auth';
 import '../../Style/FresherCoursePlayer.css';
 
@@ -14,15 +10,13 @@ const FresherCoursePlayer = () => {
     const navigate = useNavigate();
     const [course, setCourse] = useState(null);
     const [currentLectureIndex, setCurrentLectureIndex] = useState(0);
-    const [progress, setProgress] = useState(0); // New state for progress
+    const [progress, setProgress] = useState(0);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
-<<<<<<< HEAD
-=======
     const [notification, setNotification] = useState({ show: false, message: '' });
     const [isSidebarHidden, setIsSidebarHidden] = useState(false);
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
 
+    // Effect for initial course data fetch and authentication state management
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
@@ -34,16 +28,15 @@ const FresherCoursePlayer = () => {
                     if (courseDocSnap.exists()) {
                         const courseData = { id: courseDocSnap.id, ...courseDocSnap.data() };
                         setCourse(courseData);
-                        // Set initial lecture index and progress from saved data
                         setCurrentLectureIndex(courseData.currentLectureIndex || 0);
                         setProgress(courseData.progress || 0);
                     } else {
                         console.error("Course not found!");
-                        navigate('/fresher/my-courses'); // Redirect if course not found
+                        navigate('/fresher/dashboard'); // Redirect to dashboard if course not found
                     }
                 } catch (error) {
                     console.error("Error fetching course:", error);
-                    navigate('/fresher/my-courses');
+                    navigate('/fresher/dashboard');
                 } finally {
                     setLoading(false);
                 }
@@ -56,8 +49,8 @@ const FresherCoursePlayer = () => {
         return () => unsubscribeAuth();
     }, [courseId, navigate]);
 
+    // Effect to update progress in Firestore whenever lecture changes
     useEffect(() => {
-        // Update progress in Firestore whenever currentLectureIndex changes
         const updateCourseProgress = async () => {
             if (user && course && course.lectures) {
                 const newProgress = Math.min(((currentLectureIndex + 1) / course.lectures.length) * 100, 100);
@@ -92,30 +85,11 @@ const FresherCoursePlayer = () => {
                     progress: 100,
                     completed: true
                 });
-<<<<<<< HEAD
-                alert('Course Finished and Progress Saved!');
-                // Create a new assignment for the completed course
-                const assignmentsCollectionRef = collection(db, 'users', user.uid, 'assignments');
-                await addDoc(assignmentsCollectionRef, {
-                    courseId: course.id,
-                    courseTitle: course.title,
-                    status: 'pending', // Or 'assigned', 'new', etc.
-                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Example: Due in 7 days
-                    createdAt: new Date(),
-                    // Add any other relevant assessment details here
-                });
-                alert('New assignment created for this course!');
-                navigate('/fresher/dashboard', { state: { activeTab: 'assignments' } }); // Redirect to dashboard and activate assignments tab
-            } catch (error) {
-                console.error("Error marking course as finished or creating assignment:", error);
-                alert('Failed to mark course as finished or create assignment. Please try again.');
-=======
 
-                // Show completion message
                 setNotification({ show: true, message: 'Congratulations! You have completed this course.' });
 
-                // Wait for a moment, then show the assignment message
                 setTimeout(async () => {
+                    // Check if an assignment for this course already exists
                     const assignmentsCollectionRef = collection(db, 'users', user.uid, 'assignments');
                     const q = query(assignmentsCollectionRef, where('courseId', '==', course.id));
                     const querySnapshot = await getDocs(q);
@@ -128,7 +102,7 @@ const FresherCoursePlayer = () => {
                             dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Due in 7 days
                             createdAt: new Date(),
                         });
-                        setNotification({ show: true, message: 'You have unlocked an assignment for this course!' });
+                        setNotification({ show: true, message: 'A new assignment has been created for this course!' });
 
                         // Increment completedCoursesCount for the user
                         const userDocRef = doc(db, 'users', user.uid);
@@ -139,18 +113,17 @@ const FresherCoursePlayer = () => {
                         setNotification({ show: true, message: 'Assignment for this course already exists!' });
                     }
 
-                    // Wait again before redirecting
                     setTimeout(() => {
+                        setNotification({ show: false, message: '' });
                         navigate('/fresher/dashboard', { state: { activeTab: 'assignments' } });
-                    }, 3000); // Adjust delay as needed
+                    }, 3000);
 
-                }, 3000); // Adjust delay as needed
+                }, 3000);
 
             } catch (error) {
                 console.error("Error marking course as finished or creating assignment:", error);
                 setNotification({ show: true, message: 'Failed to update course. Please try again.' });
                 setTimeout(() => setNotification({ show: false, message: '' }), 3000);
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
             }
         }
     };
@@ -171,12 +144,8 @@ const FresherCoursePlayer = () => {
     const currentLecture = course.lectures[currentLectureIndex];
 
     return (
-<<<<<<< HEAD
-        <div className="fresher-course-player">
-            <div className="video-player-section">
-=======
         <div className={`fresher-course-player ${isSidebarHidden ? 'sidebar-hidden' : ''}`}>
-             {notification.show && (
+            {notification.show && (
                 <div className="notification-animation">
                     {notification.message}
                 </div>
@@ -185,7 +154,6 @@ const FresherCoursePlayer = () => {
                 <button className="toggle-sidebar-btn" onClick={() => setIsSidebarHidden(!isSidebarHidden)}>
                     {isSidebarHidden ? 'Show Sidebar' : 'Hide Sidebar'}
                 </button>
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                 {currentLecture && currentLecture.videoUrl ? (
                     <video controls autoPlay key={currentLecture.videoUrl} className="main-video-player">
                         <source src={currentLecture.videoUrl} type="video/mp4" />
@@ -214,29 +182,13 @@ const FresherCoursePlayer = () => {
                 </div>
             </div>
 
-<<<<<<< HEAD
-            <div className="course-sidebar">
-                <h3>{course.title}</h3>
-                <div className="lectures-list">
-                    {course.lectures.map((lecture, index) => (
-                        <div 
-                            key={lecture.id || index} 
-                            className={`sidebar-lecture-item ${index === currentLectureIndex ? 'active' : ''}`}
-                            onClick={() => setCurrentLectureIndex(index)}
-                        >
-                            <span>{index + 1}. {lecture.title}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-=======
             {!isSidebarHidden && (
                 <div className="course-sidebar">
                     <h3>{course.title}</h3>
                     <div className="lectures-list">
                         {course.lectures.map((lecture, index) => (
-                            <div 
-                                key={lecture.id || index} 
+                            <div
+                                key={lecture.id || index}
                                 className={`sidebar-lecture-item ${index === currentLectureIndex ? 'active' : ''}`}
                                 onClick={() => setCurrentLectureIndex(index)}
                             >
@@ -246,7 +198,6 @@ const FresherCoursePlayer = () => {
                     </div>
                 </div>
             )}
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
         </div>
     );
 };

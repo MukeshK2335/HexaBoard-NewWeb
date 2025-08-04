@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import '../../Style/FresherDashboard.css';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { db } from "../../firebase";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -18,131 +18,87 @@ function formatDate(ts) {
     return '';
 }
 
-<<<<<<< HEAD
 const Dashboard = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [data, setData] = useState({ activeCourses: 0, pendingAssignments: 0, completed: 0, pendingCourses: 0, completedCourses: 0 });
-=======
-
-
-const Dashboard = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [data, setData] = useState({ activeCourses: 0, pendingAssignments: 0, completed: 0, pendingCourses: 0, completedCourses: 0 });
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
     const [userName, setUserName] = useState("...");
     const [certifications, setCertifications] = useState([]);
-    const [assignments, setAssignments] = useState([]); // New state for assignments
+    const [assignments, setAssignments] = useState([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [progressData, setProgressData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'dashboard');
-    const [selectedCourse, setSelectedCourse] = useState(null);
     const dropdownRef = useRef(null);
 
+    // Handles user logout
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            navigate("/"); // Navigate to home or login page after logout
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    };
+
+    // Handles clicks outside the dropdown menu to close it
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    // Fetches user data, courses, assignments, and progress from Firestore
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            try {
-                setLoading(true);
-                setError(null);
-<<<<<<< HEAD
-                console.log("onAuthStateChanged fired. User:", user);
-                if (user) {
-                    // Fetch user profile data
-                    const docRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(docRef);
-                    if (userSnap.exists()) {
-                        const userData = userSnap.data();
-                        console.log("Fetched user data:", userData);
-                        setUserName(userData.name || "Fresher");
-                        setData({
-                            activeCourses: userData.activeCourses || courseData.length,
-                            pendingAssignments: userData.pendingAssignments || 8,
-                            completed: userData.completedAssignments || 12,
-                        });
-                    } else {
-                        setError("User profile not found.");
-                        setUserName("Fresher");
-                        console.error("User profile not found for UID:", user.uid);
-                    }
-                    // Fetch certifications
-                    try {
-                        const certRef = collection(db, "users", user.uid, "certifications");
-                        const certSnap = await getDocs(certRef);
-                        const certs = certSnap.docs.map(doc => doc.data());
-                        setCertifications(certs);
-                        console.log("Fetched certifications:", certs);
-                    } catch (certErr) {
-                        console.error("Error loading certifications:", certErr);
-                        setCertifications([]);
-                    }
-                    // Fetch progress data (date-by-date)
-                    try {
-                        const progressRef = collection(db, "users", user.uid, "progress");
-                        const progressSnap = await getDocs(progressRef);
-                        const progressArr = progressSnap.docs.map(doc => doc.data());
-                        // Defensive: filter for valid entries
-                        const filtered = progressArr.filter(p => p.date && typeof p.progress === 'number');
-                        filtered.sort((a, b) => (a.date > b.date ? 1 : -1));
-                        setProgressData(filtered);
-                        console.log("Fetched progress data:", filtered);
-                    } catch (progressErr) {
-                        console.error("Error loading progress data:", progressErr);
-                        setProgressData([]);
-                    }
+            setLoading(true);
+            setError(null);
 
-                    // Fetch assignments
-                    try {
-=======
-                if (user) {
-                    const docRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(docRef);
+            if (user) {
+                try {
+                    // Fetch user profile data and other collections concurrently
+                    const [
+                        userSnap,
+                        userCoursesSnap,
+                        assignmentsSnap,
+                        certSnap,
+                        progressSnap
+                    ] = await Promise.all([
+                        getDoc(doc(db, "users", user.uid)),
+                        getDocs(collection(db, "users", user.uid, "courses")),
+                        getDocs(collection(db, "users", user.uid, "assignments")),
+                        getDocs(collection(db, "users", user.uid, "certifications")),
+                        getDocs(collection(db, "users", user.uid, "progress"))
+                    ]);
 
                     if (userSnap.exists()) {
                         const userData = userSnap.data();
                         setUserName(userData.name || "Fresher");
 
-                        // Fetch user's courses from Firestore
-                        const userCoursesRef = collection(db, "users", user.uid, "courses");
-                        const userCoursesSnap = await getDocs(userCoursesRef);
+                        // Process and set data from fetched collections
                         const userCoursesList = userCoursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        const assignmentsList = assignmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        const certs = certSnap.docs.map(doc => doc.data());
+                        const progressArr = progressSnap.docs.map(doc => doc.data());
 
                         const activeCoursesCount = userCoursesList.filter(course => !course.completed).length;
                         const completedCoursesCount = userCoursesList.filter(course => course.completed).length;
-
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
-                        const assignmentsRef = collection(db, "users", user.uid, "assignments");
-                        const assignmentsSnap = await getDocs(assignmentsRef);
-                        const assignmentsList = assignmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        setAssignments(assignmentsList);
-<<<<<<< HEAD
-                        console.log("Fetched assignments:", assignmentsList);
-                    } catch (assignmentErr) {
-                        console.error("Error loading assignments:", assignmentErr);
-                        setAssignments([]);
-                    }
-
-                } else {
-                    setError("No user is logged in.");
-                    console.error("No user is logged in.");
-=======
-
-                        const certRef = collection(db, "users", user.uid, "certifications");
-                        const certSnap = await getDocs(certRef);
-                        const certs = certSnap.docs.map(doc => doc.data());
-                        setCertifications(certs);
-
-                        const progressRef = collection(db, "users", user.uid, "progress");
-                        const progressSnap = await getDocs(progressRef);
-                        const progressArr = progressSnap.docs.map(doc => doc.data());
-                        const filtered = progressArr.filter(p => p.date && typeof p.progress === 'number');
-                        filtered.sort((a, b) => (a.date > b.date ? 1 : -1));
-                        setProgressData(filtered);
-
                         const pendingAssignments = assignmentsList.filter(a => a.status !== 'Completed').length;
                         const completedAssignments = assignmentsList.length - pendingAssignments;
+
+                        setAssignments(assignmentsList);
+                        setCertifications(certs);
+
+                        const filteredProgress = progressArr.filter(p => p.date && typeof p.progress === 'number');
+                        filteredProgress.sort((a, b) => (a.date > b.date ? 1 : -1));
+                        setProgressData(filteredProgress);
 
                         setData({
                             activeCourses: activeCoursesCount,
@@ -155,77 +111,25 @@ const Dashboard = () => {
                         setError("User profile not found.");
                         setUserName("Fresher");
                     }
-                } else {
-                    setError("No user is logged in.");
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
+                } catch (err) {
+                    console.error("Error fetching data:", err);
+                    setError("Failed to load dashboard data. Please try again.");
                 }
-            } catch (err) {
-                console.error("Error loading user data:", err);
-                setError("Failed to load user data. Please try again.");
-            } finally {
-                setLoading(false);
+            } else {
+                setError("No user is logged in.");
+                navigate('/login'); // Redirect to login if no user is found
             }
+            setLoading(false);
         });
+
         return () => unsubscribe();
-    }, []);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setDropdownOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    const handleLogout = () => {
-        signOut(auth).catch(console.error);
-    };
-
-    const getProgressColor = (progress) => {
-        if (progress >= 80) return "#10b981";
-        if (progress >= 60) return "#f59e0b";
-        if (progress >= 40) return "#f97316";
-        return "#ef4444";
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "Completed": return "#10b981";
-            case "In Progress": return "#3b82f6";
-            case "Just Started": return "#f59e0b";
-            default: return "#6b7280";
-        }
-    };
-
-    const renderStars = (rating) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
-        
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<span key={i} className="star filled">★</span>);
-        }
-        
-        if (hasHalfStar) {
-            stars.push(<span key="half" className="star half">★</span>);
-        }
-        
-        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-        for (let i = 0; i < emptyStars; i++) {
-            stars.push(<span key={`empty-${i}`} className="star empty">★</span>);
-        }
-        
-        return stars;
-    };
+    }, [navigate]);
 
     if (loading) {
-        console.log("Loading state: true");
         return <LoadingScreen message="Loading dashboard..." />;
     }
+
     if (error) {
-        console.error("Dashboard error state:", error);
         return (
             <div style={{
                 display: 'flex',
@@ -238,14 +142,12 @@ const Dashboard = () => {
                 background: '#fff8f8',
                 textAlign: 'center',
             }}>
-                <div style={{fontSize: '2.5rem', marginBottom: 16}}>⚠️</div>
+                <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>⚠️</div>
                 <div>{error}</div>
-                <button style={{marginTop: 24, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontWeight: 600, cursor: 'pointer'}} onClick={() => window.location.reload()}>Retry</button>
+                <button style={{ marginTop: 24, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#6366f1', color: '#fff', fontWeight: 600, cursor: 'pointer' }} onClick={() => window.location.reload()}>Retry</button>
             </div>
         );
     }
-
-    console.log("Rendering dashboard with:", { userName, data, certifications, progressData });
 
     const renderDashboard = () => (
         <>
@@ -270,13 +172,8 @@ const Dashboard = () => {
                     <p className="count">{data.pendingAssignments}</p>
                 </div>
                 <div className="card">
-<<<<<<< HEAD
-                    <h4>Completed</h4>
-                    <p className="count">{data.completed}</p>
-=======
                     <h4>Completed Courses</h4>
                     <p className="count">{data.completedCourses}</p>
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
                 </div>
             </section>
 
@@ -299,7 +196,7 @@ const Dashboard = () => {
                             <Bar dataKey="progress" fill="#6366f1" radius={[8, 8, 0, 0]} />
                         </BarChart>
                     ) : (
-                        <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '1.1rem'}}>
+                        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '1.1rem' }}>
                             No progress data available.
                         </div>
                     )}
@@ -336,13 +233,9 @@ const Dashboard = () => {
                             <h5>{assignment.courseTitle}</h5>
                             <p>Status: <span className={`assignment-status ${assignment.status}`}>{assignment.status}</span></p>
                             {assignment.dueDate && <p>Due: {formatDate(assignment.dueDate)}</p>}
-                            <button 
+                            <button
                                 className="take-assessment-btn"
-<<<<<<< HEAD
-                                onClick={() => navigate(`/fresher/assessment/${assignment.id}`)} // Placeholder navigation
-=======
-                                onClick={() => navigate(`/take-assessment/${assignment.courseId}`)} // Navigate using courseId
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
+                                onClick={() => navigate(`/take-assessment/${assignment.courseId}`)}
                             >
                                 Take Assessment
                             </button>
@@ -353,182 +246,11 @@ const Dashboard = () => {
         </section>
     );
 
+    // This function will render the MyCourses component. The commented-out code
+    // from the previous version was trying to render course cards directly, which
+    // is better handled within the dedicated MyCourses component.
     const renderCourses = () => (
-        <>
-            {/* Course Header */}
-            <section className="course-header-section">
-                <div className="course-header-content">
-                    <h1>My Learning</h1>
-                    <p>Continue where you left off</p>
-                </div>
-                <div className="course-filters">
-                    <button className="filter-btn active">All Courses</button>
-                    <button className="filter-btn">In Progress</button>
-                    <button className="filter-btn">Completed</button>
-                    <button className="filter-btn">Wishlist</button>
-                </div>
-            </section>
-
-            {/* Course Grid */}
-            <section className="course-grid">
-<<<<<<< HEAD
-                {courseData.map((course) => (
-=======
-                {/* courseData.map((course) => (
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
-                    <div key={course.id} className="course-card" onClick={() => setSelectedCourse(course)}>
-                        <div className="course-thumbnail">
-                            <img src={course.thumbnail} alt={course.title} />
-                            <div className="course-overlay">
-                                <div className="play-button">▶</div>
-                            </div>
-                            <div className="course-progress-overlay">
-                                <div className="progress-circle">
-                                    <svg viewBox="0 0 36 36">
-                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="2"/>
-                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={getProgressColor(course.progress)} strokeWidth="2" strokeDasharray={`${course.progress}, 100`} strokeLinecap="round"/>
-                                    </svg>
-                                    <span className="progress-text">{course.progress}%</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="course-content">
-                            <div className="course-info">
-                                <h3 className="course-title">{course.title}</h3>
-                                <p className="course-subtitle">{course.subtitle}</p>
-                                
-                                <div className="course-instructor">
-                                    <img src={course.instructorImage} alt={course.instructor} className="instructor-avatar" />
-                                    <div className="instructor-info">
-                                        <span className="instructor-name">{course.instructor}</span>
-                                        <span className="instructor-title">{course.instructorTitle}</span>
-                                    </div>
-                                </div>
-                                
-                                <div className="course-rating">
-                                    <div className="stars">
-                                        {renderStars(course.rating)}
-                                    </div>
-                                    <span className="rating-text">{course.rating}</span>
-                                    <span className="rating-count">({course.totalRatings.toLocaleString()})</span>
-                                </div>
-                                
-                                <div className="course-meta">
-                                    <span className="meta-item">{course.duration}</span>
-                                    <span className="meta-item">{course.lectures} lectures</span>
-                                    <span className="meta-item">{course.level}</span>
-                                </div>
-                                
-                                <div className="course-price">
-                                    <span className="current-price">${course.currentPrice}</span>
-                                    <span className="original-price">${course.originalPrice}</span>
-                                    <span className="discount">{Math.round(((course.originalPrice - course.currentPrice) / course.originalPrice) * 100)}% off</span>
-                                </div>
-                            </div>
-                            
-                            <div className="course-actions">
-                                <button className="continue-btn">Continue Learning</button>
-                                <button className="wishlist-btn">♡</button>
-                            </div>
-                        </div>
-                    </div>
-<<<<<<< HEAD
-                ))}
-=======
-                ))} */}
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
-            </section>
-
-            {/* Course Detail Modal */}
-            {selectedCourse && (
-                <div className="modal-overlay" onClick={() => setSelectedCourse(null)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <div className="modal-course-info">
-                                <img src={selectedCourse.thumbnail} alt={selectedCourse.title} className="modal-thumbnail" />
-                                <div>
-                                    <h3>{selectedCourse.title}</h3>
-                                    <p className="modal-subtitle">{selectedCourse.subtitle}</p>
-                                </div>
-                            </div>
-                            <button className="close-btn" onClick={() => setSelectedCourse(null)}>×</button>
-                        </div>
-                        
-                        <div className="modal-body">
-                            <div className="course-overview">
-                                <div className="overview-stats">
-                                    <div className="stat-item">
-                                        <span className="stat-label">Progress</span>
-                                        <span className="stat-value">{selectedCourse.progress}%</span>
-                                    </div>
-                                    <div className="stat-item">
-                                        <span className="stat-label">Duration</span>
-                                        <span className="stat-value">{selectedCourse.duration}</span>
-                                    </div>
-                                    <div className="stat-item">
-                                        <span className="stat-label">Lectures</span>
-                                        <span className="stat-value">{selectedCourse.lectures}</span>
-                                    </div>
-                                    <div className="stat-item">
-                                        <span className="stat-label">Level</span>
-                                        <span className="stat-value">{selectedCourse.level}</span>
-                                    </div>
-                                </div>
-                                
-                                <div className="course-instructor-modal">
-                                    <img src={selectedCourse.instructorImage} alt={selectedCourse.instructor} />
-                                    <div>
-                                        <h4>{selectedCourse.instructor}</h4>
-                                        <p>{selectedCourse.instructorTitle}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="course-curriculum">
-                                <h4>Course Content</h4>
-                                {selectedCourse.modules.map((module) => (
-                                    <div key={module.id} className="module-item">
-                                        <div className="module-header">
-                                            <h5>{module.title}</h5>
-                                            <span className="module-progress">{module.progress}%</span>
-                                        </div>
-                                        <div className="module-progress-bar">
-                                            <div 
-                                                className="module-progress-fill" 
-                                                style={{
-                                                    width: `${module.progress}%`,
-                                                    backgroundColor: getProgressColor(module.progress)
-                                                }}
-                                            ></div>
-                                        </div>
-                                        <div className="lessons-list">
-                                            {module.lessons.map((lesson) => (
-                                                <div key={lesson.id} className="lesson-item">
-                                                    <div className="lesson-info">
-                                                        <span className="lesson-title">{lesson.title}</span>
-                                                        <span className="lesson-duration">{lesson.duration}</span>
-                                                    </div>
-                                                    <div className="lesson-status">
-                                                        {lesson.completed ? (
-                                                            <span className="status-completed">✓ Completed</span>
-                                                        ) : lesson.progress > 0 ? (
-                                                            <span className="status-in-progress">{lesson.progress}%</span>
-                                                        ) : (
-                                                            <span className="status-not-started">Not Started</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </>
+        <MyCourses />
     );
 
     return (
@@ -538,28 +260,24 @@ const Dashboard = () => {
                 <aside className="sidebar">
                     <div className="logo">HexaBoard</div>
                     <nav className="nav-links">
-                        <a 
-                            href="#" 
-                            className={activeTab === 'dashboard' ? 'active' : ''} 
+                        <a
+                            href="#"
+                            className={activeTab === 'dashboard' ? 'active' : ''}
                             onClick={() => setActiveTab('dashboard')}
                         >
                             Dashboard
                         </a>
-                        <a 
-                            href="#" 
-                            className={activeTab === 'courses' ? 'active' : ''} 
+                        <a
+                            href="#"
+                            className={activeTab === 'courses' ? 'active' : ''}
                             onClick={() => setActiveTab('courses')}
                         >
                             My Courses
                         </a>
-<<<<<<< HEAD
-                        <a href="#">Schedule</a>
-=======
                         <a href="#">Daily Quiz</a>
->>>>>>> 83f4f3d3335b699437cfc515531ce1efaced1803
-                        <a 
-                            href="#" 
-                            className={activeTab === 'assignments' ? 'active' : ''} 
+                        <a
+                            href="#"
+                            className={activeTab === 'assignments' ? 'active' : ''}
                             onClick={() => setActiveTab('assignments')}
                         >
                             Assignments
@@ -583,7 +301,8 @@ const Dashboard = () => {
                         </div>
                     </header>
 
-                    {activeTab === 'dashboard' ? renderDashboard() : activeTab === 'courses' ? <MyCourses /> : renderAssignments()}
+                    {/* Main content rendering based on active tab */}
+                    {activeTab === 'dashboard' ? renderDashboard() : activeTab === 'courses' ? renderCourses() : renderAssignments()}
                 </main>
             </div>
 
