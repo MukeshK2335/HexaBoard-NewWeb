@@ -84,7 +84,6 @@ function App() {
                         <AssessmentPage />
                     </ProtectedRoute>
                 } />
-
             </Routes>
         </Router>
     );
