@@ -57,36 +57,98 @@ const AssessmentPage = () => {
 
                     console.log("Course Title for Gemini Prompt:", courseTitle); // Added for debugging
 
-                    // Generate questions using Gemini API
+                    // Generate questions using Gemini API with retry mechanism
                     const genAI = new GoogleGenerativeAI("AIzaSyCkUv7HTH3t_JMcatllJLSYZYulExNXvnM");
-                    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                    const models = [
+                        { name: "gemini-1.5-flash", retries: 2 },
+                        { name: "gemini-1.5-pro", retries: 1 },
+                        { name: "gemini-pro", retries: 1 }
+                    ];
+                    
                     const prompt = `Generate 5 multiple-choice questions specifically and strictly about "${courseTitle}". Ensure all questions are directly related to this topic and avoid general knowledge. Each question should have 4 options (A, B, C, D) and indicate the correct answer. The output MUST be a JSON array of objects, and nothing else. Example: [{"question": "What is X?", "options": ["A", "B", "C", "D"], "correctAnswer": "A"}]`;
-                    const result = await model.generateContent(prompt);
-                    const response = await result.response;
-                    let geminiResponse = response.text();
-
-                    // Clean the response by removing markdown code block if present
-                    const jsonMatch = geminiResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-                    if (jsonMatch && jsonMatch[1]) {
-                        geminiResponse = jsonMatch[1].trim();
-                    } else {
-                        geminiResponse = geminiResponse.trim();
-                    }
-
-                    console.log("Type of Gemini response:", typeof geminiResponse);
-                    console.log("Raw Gemini response:", geminiResponse);
+                    
                     let generatedQuestions = [];
-                    try {
-                        generatedQuestions = JSON.parse(geminiResponse);
-                        if (!Array.isArray(generatedQuestions) || generatedQuestions.some(q => !q.question || !Array.isArray(q.options) || q.options.length !== 4 || !q.correctAnswer)) {
-                            throw new Error("Invalid question structure from Gemini API.");
+                    let success = false;
+                    
+                    // Try each model with retries
+                    for (const modelConfig of models) {
+                        if (success) break;
+                        
+                        const model = genAI.getGenerativeModel({ model: modelConfig.name });
+                        console.log(`Attempting to use ${modelConfig.name} model...`);
+                        
+                        for (let attempt = 0; attempt <= modelConfig.retries; attempt++) {
+                            if (success) break;
+                            
+                            try {
+                                if (attempt > 0) {
+                                    console.log(`Retry attempt ${attempt} with ${modelConfig.name}...`);
+                                    // Add exponential backoff delay
+                                    await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+                                }
+                                
+                                const result = await model.generateContent(prompt);
+                                const response = await result.response;
+                                let geminiResponse = response.text();
+
+                                // Clean the response by removing markdown code block if present
+                                const jsonMatch = geminiResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+                                if (jsonMatch && jsonMatch[1]) {
+                                    geminiResponse = jsonMatch[1].trim();
+                                } else {
+                                    geminiResponse = geminiResponse.trim();
+                                }
+
+                                console.log(`${modelConfig.name} response type:`, typeof geminiResponse);
+                                
+                                generatedQuestions = JSON.parse(geminiResponse);
+                                if (Array.isArray(generatedQuestions) && 
+                                    !generatedQuestions.some(q => !q.question || !Array.isArray(q.options) || q.options.length !== 4 || !q.correctAnswer)) {
+                                    success = true;
+                                    console.log(`Successfully generated questions using ${modelConfig.name}`);
+                                    break;
+                                } else {
+                                    throw new Error("Invalid question structure from Gemini API.");
+                                }
+                            } catch (error) {
+                                console.error(`Error with ${modelConfig.name} (attempt ${attempt + 1}/${modelConfig.retries + 1}):`, error);
+                                if (attempt === modelConfig.retries && modelConfig === models[models.length - 1]) {
+                                    console.log("All models and retries failed, using fallback questions");
+                                }
+                            }
                         }
-                    } catch (parseError) {
-                        console.error("Failed to parse Gemini response as JSON:", parseError);
-                        console.log("Raw Gemini response (in catch):", geminiResponse);
-                        setError("Failed to generate questions. Please try again. (Invalid API response format)");
-                        setLoading(false);
-                        return;
+                    }
+                    
+                    // If all models fail, use fallback questions
+                    if (!success) {
+                        console.log("Using fallback questions for", courseTitle);
+                        generatedQuestions = [
+                            {
+                                question: `What is the main focus of the course "${courseTitle}"?`,
+                                options: ["Learning core concepts", "Practical application", "Historical background", "Advanced techniques"],
+                                correctAnswer: "Learning core concepts"
+                            },
+                            {
+                                question: `Which of the following best describes "${courseTitle}"?`,
+                                options: ["Introductory course", "Advanced specialization", "Technical certification", "General knowledge"],
+                                correctAnswer: "Introductory course"
+                            },
+                            {
+                                question: `What skills would you likely develop in "${courseTitle}"?`,
+                                options: ["Critical thinking", "Technical expertise", "Communication", "All of the above"],
+                                correctAnswer: "All of the above"
+                            },
+                            {
+                                question: `How would knowledge from "${courseTitle}" be applied in a professional setting?`,
+                                options: ["Problem-solving", "Team collaboration", "Project management", "All of the above"],
+                                correctAnswer: "All of the above"
+                            },
+                            {
+                                question: `What is a potential career path after mastering "${courseTitle}"?`,
+                                options: ["Specialist in the field", "Consultant", "Researcher", "Any of the above"],
+                                correctAnswer: "Any of the above"
+                            }
+                        ];
                     }
                     setQuestions(generatedQuestions);
                 } else {
@@ -206,27 +268,73 @@ const AssessmentPage = () => {
             alert("No user logged in. Cannot save score.");
         }
 
-        let feedbackText = "Failed to generate feedback. Please try again later."; // Initialize feedbackText
+        // Initialize with a fallback feedback message
+        let feedbackText = `Congratulations on completing the assessment for "${assessment.title}"!
+
+You scored ${percentageScore.toFixed(2)}% (${score} out of ${totalQuestions} questions correct).
+
+Keep practicing and reviewing the course materials to improve your understanding of the subject matter. Focus on the areas where you made mistakes and consider revisiting those sections of the course.
+
+Great job on taking this step in your learning journey!`;
+        
         try {
             const genAI = new GoogleGenerativeAI("AIzaSyCkUv7HTH3t_JMcatllJLSYZYulExNXvnM");
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const result = await model.generateContent(feedbackPrompt);
-            const response = await result.response;
-            feedbackText = response.text(); // Assign to the already declared variable
+            const models = [
+                { name: "gemini-1.5-flash", retries: 2 },
+                { name: "gemini-1.5-pro", retries: 1 },
+                { name: "gemini-pro", retries: 1 }
+            ];
+            
+            let success = false;
+            
+            // Try each model with retries
+            for (const modelConfig of models) {
+                if (success) break;
+                
+                const model = genAI.getGenerativeModel({ model: modelConfig.name });
+                console.log(`Attempting to use ${modelConfig.name} model for feedback...`);
+                
+                for (let attempt = 0; attempt <= modelConfig.retries; attempt++) {
+                    if (success) break;
+                    
+                    try {
+                        if (attempt > 0) {
+                            console.log(`Retry attempt ${attempt} with ${modelConfig.name} for feedback...`);
+                            // Add exponential backoff delay
+                            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+                        }
+                        
+                        const result = await model.generateContent(feedbackPrompt);
+                        const response = await result.response;
+                        const responseText = response.text();
 
-            // Clean the response by removing markdown code block if present
-            const jsonMatch = feedbackText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-            if (jsonMatch && jsonMatch[1]) {
-                feedbackText = jsonMatch[1].trim();
-            } else {
-                feedbackText = feedbackText.trim();
+                        // Clean the response by removing markdown code block if present
+                        const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+                        if (jsonMatch && jsonMatch[1]) {
+                            feedbackText = jsonMatch[1].trim();
+                        } else {
+                            feedbackText = responseText.trim();
+                        }
+
+                        // If we got here without errors, mark as success
+                        success = true;
+                        console.log(`Successfully generated feedback using ${modelConfig.name}`);
+                        break;
+                    } catch (error) {
+                        console.error(`Error with ${modelConfig.name} for feedback (attempt ${attempt + 1}/${modelConfig.retries + 1}):`, error);
+                        if (attempt === modelConfig.retries && modelConfig === models[models.length - 1]) {
+                            console.log("All models and retries failed for feedback, using fallback feedback");
+                            // Fallback feedback is already set at the beginning
+                        }
+                    }
+                }
             }
-
+            
             setGeminiFeedback(feedbackText);
             setShowFeedbackModal(true);
         } catch (err) {
-            console.error("Error generating feedback from Gemini:", err);
-            setGeminiFeedback(feedbackText); // Use the initialized/updated feedbackText
+            console.error("Error in feedback generation process:", err);
+            setGeminiFeedback(feedbackText); // Use the fallback feedback
             setShowFeedbackModal(true);
         } finally {
             // Navigate back to dashboard after feedback is shown or error occurs
