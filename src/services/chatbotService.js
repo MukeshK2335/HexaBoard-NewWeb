@@ -76,7 +76,26 @@ export const chatbotService = {
             const response = await result.response;
             const text = response.text();
             console.log("Gemini API raw text response:", text);
-            return text;
+            // Remove markdown code block if present
+            // Remove markdown code block if present
+            // Remove markdown code block if present
+            // Remove markdown code block if present
+            // Aggressively remove markdown code block delimiters
+            // Aggressively remove markdown code block delimiters
+            // Aggressively remove markdown code block delimiters
+            let cleanedText = text.trim();
+            const jsonMatch = cleanedText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (jsonMatch && jsonMatch[1]) {
+                cleanedText = jsonMatch[1].trim();
+            } else {
+                // Fallback if no markdown block is found, try to parse as is
+                cleanedText = cleanedText.trim();
+            }
+            return cleanedText;
+            return cleanedText;
+            return cleanedText;
+            return cleanedText;
+            return cleanedText;
         } catch (error) {
             console.error("Gemini API Error:", error);
             return "I'm having trouble connecting to the AI. Please try again later. Check the browser console for more details.";

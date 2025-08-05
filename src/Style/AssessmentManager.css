@@ -459,6 +459,14 @@
     .edit-btn, .delete-btn {
         width: 100%;
     }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.2rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -564,5 +572,283 @@
 
     .empty-state h3 {
         font-size: 1.2rem;
+    }
+}
+
+.assessment-success-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 1.5em;
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.feedback-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001; /* Higher than success message */
+}
+
+.feedback-modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.feedback-modal-content h3 {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 1.8em;
+}
+
+.feedback-modal-content p {
+    font-size: 1.1em;
+    color: #333;
+    line-height: 1.6;
+    white-space: pre-wrap; /* Preserve line breaks from Gemini */
+}
+
+.feedback-modal-content button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background 0.2s ease;
+}
+
+.feedback-modal-content button:hover {
+    background: #3730a3;
+}
+
+/* New styles for AssessmentPage */
+.assessment-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.assessment-page h2 {
+    font-size: 2.5em;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.assessment-instructions {
+    font-size: 1.1em;
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.question-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.question-container h3 {
+    font-size: 1.8em;
+    color: #444;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.question-text {
+    font-size: 1.3em;
+    color: #333;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-item:hover {
+    background-color: #eef2ff;
+    border-color: #6366f1;
+}
+
+.option-item input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.2);
+    accent-color: #6366f1;
+}
+
+.option-item label {
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    margin-top: 20px;
+}
+
+.navigation-buttons button {
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.navigation-buttons button:hover {
+    background-color: #4f46e5;
+    transform: translateY(-2px);
+}
+
+.navigation-buttons button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.finish-button {
+    background-color: #10b981 !important;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3) !important;
+}
+
+.finish-button:hover {
+    background-color: #059669 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .assessment-page {
+        padding: 15px;
+    }
+
+    .assessment-page h2 {
+        font-size: 2em;
+    }
+
+    .assessment-instructions {
+        font-size: 1em;
+    }
+
+    .question-container {
+        padding: 20px;
+    }
+
+    .question-container h3 {
+        font-size: 1.5em;
+    }
+
+    .question-text {
+        font-size: 1.1em;
+    }
+
+    .option-item {
+        padding: 12px 15px;
+    }
+
+    .option-item label {
+        font-size: 1em;
+    }
+
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0;
+    }
+
+    .navigation-buttons button {
+        width: 100%;
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .assessment-page h2 {
+        font-size: 1.8em;
+    }
+
+    .question-container h3 {
+        font-size: 1.3em;
+    }
+
+    .question-text {
+        font-size: 1em;
+    }
+
+    .option-item {
+        padding: 10px 12px;
+    }
+
+    .option-item label {
+        font-size: 0.9em;
+    }
+
+    .navigation-buttons button {
+        font-size: 0.9em;
+        padding: 8px 15px;
     }
 }

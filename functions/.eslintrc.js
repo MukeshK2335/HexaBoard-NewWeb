@@ -1,5 +1,4 @@
-/* eslint-env node */
-/* global module, exports */
+
 
 module.exports = {
   env: {
@@ -25,14 +24,26 @@ module.exports = {
     "no-unused-vars": ["warn"],
   },
   overrides: [
-    {
-      files: ["**/*.spec.*"],
-      env: {
-        mocha: true,
-      },
-      rules: {},
+  {
+    files: ["functions/**/*.js"],
+    env: {
+      node: true,
     },
-  ],
+    globals: {
+      module: "readonly",
+      exports: "readonly",
+      require: "readonly",
+    },
+  },
+  {
+    files: ["**/*.spec.*"],
+    env: {
+      mocha: true,
+    },
+    rules: {},
+  },
+],
+
   globals: {
     module: true,
     exports: true,

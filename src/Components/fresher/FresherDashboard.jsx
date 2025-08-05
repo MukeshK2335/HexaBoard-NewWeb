@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import '../../Style/FresherDashboard.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { db } from "../../firebase";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../../firebase";
 import LoadingScreen from "../LoadingScreen.jsx";
@@ -33,10 +33,18 @@ const Dashboard = () => {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'dashboard');
     const [selectedCourse, setSelectedCourse] = useState(null);
+    const [geminiFeedback, setGeminiFeedback] = useState(null); // New state for Gemini feedback
     const dropdownRef = useRef(null);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        // Check for Gemini feedback from location state
+        if (location.state?.geminiFeedback) {
+            setGeminiFeedback(location.state.geminiFeedback);
+            // Clear the feedback from state to prevent it from showing again on refresh
+            navigate(location.pathname, { replace: true, state: { ...location.state, geminiFeedback: undefined } });
+        }
+
+        const fetchData = async (user) => {
             try {
                 setLoading(true);
                 setError(null);
@@ -60,6 +68,7 @@ const Dashboard = () => {
                         const assignmentsSnap = await getDocs(assignmentsRef);
                         const assignmentsList = assignmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                         setAssignments(assignmentsList);
+                        console.log("Fetched assignments:", assignmentsList);
 
                         const certRef = collection(db, "users", user.uid, "certifications");
                         const certSnap = await getDocs(certRef);
@@ -96,9 +105,28 @@ const Dashboard = () => {
             } finally {
                 setLoading(false);
             }
+        };
+
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchData(user);
+            } else {
+                setLoading(false);
+                setError("No user is logged in.");
+            }
         });
+
+        // Re-fetch data if refreshAssignments flag is set
+        if (location.state?.refreshAssignments) {
+            if (auth.currentUser) {
+                fetchData(auth.currentUser);
+            }
+            // Clear the flag after processing
+            navigate(location.pathname, { replace: true, state: { ...location.state, refreshAssignments: false } });
+        }
+
         return () => unsubscribe();
-    }, []);
+    }, [location.state?.refreshAssignments, navigate, location.pathname, location.state]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -206,27 +234,23 @@ const Dashboard = () => {
                 </div>
             </section>
 
-            {/* Progress Chart - Bar Chart by Date */}
+            {/* Assignment Marks Chart */}
             <section className="progress">
                 <div className="progress-header">
-                    <h4>Your Learning Progress</h4>
-                    <select>
-                        <option>This Month</option>
-                        <option>Last Month</option>
-                    </select>
+                    <h4>Assignment Marks Progress</h4>
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
-                    {progressData && progressData.length > 0 ? (
-                        <BarChart data={progressData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    {assignments && assignments.length > 0 ? (
+                        <BarChart data={assignments} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
+                            <XAxis dataKey="courseTitle" />
                             <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="progress" fill="#6366f1" radius={[8, 8, 0, 0]} />
+                            <Tooltip formatter={(value) => [`Marks: ${value}`, '']}/>
+                            <Bar dataKey="marks" fill="#6366f1" radius={[8, 8, 0, 0]} />
                         </BarChart>
                     ) : (
                         <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '1.1rem'}}>
-                            No progress data available.
+                            No assignment marks data available.
                         </div>
                     )}
                 </ResponsiveContainer>
@@ -264,7 +288,25 @@ const Dashboard = () => {
                             {assignment.dueDate && <p>Due: {formatDate(assignment.dueDate)}</p>}
                             <button 
                                 className="take-assessment-btn"
-                                onClick={() => navigate(`/take-assessment/${assignment.courseId}`)} // Navigate using courseId
+                                onClick={async () => {
+                                    try {
+                                        console.log("Attempting to find assessment for courseId:", assignment.courseId);
+                                        const assessmentsQuery = query(collection(db, 'assessments'), where("courseId", "==", assignment.courseId));
+                                        const querySnapshot = await getDocs(assessmentsQuery);
+                                        
+                                        if (!querySnapshot.empty) {
+                                            const assessmentId = querySnapshot.docs[0].id;
+                                            console.log("Found assessmentId:", assessmentId, "for courseId:", assignment.courseId);
+                                            navigate(`/take-assessment/${assessmentId}`);
+                                        } else {
+                                            console.warn("No assessment found for courseId:", assignment.courseId);
+                                            alert("No assessment found for this course.");
+                                        }
+                                    } catch (error) {
+                                        console.error("Error fetching assessment for course:", assignment.courseId, error);
+                                        alert("Failed to load assessment. Please try again.");
+                                    }
+                                }}
                             >
                                 Take Assessment
                             </button>
@@ -499,6 +541,16 @@ const Dashboard = () => {
 
             {/* Chatbot */}
             <Chatbot />
+
+            {geminiFeedback && (
+                <div className="feedback-modal-overlay">
+                    <div className="feedback-modal-content">
+                        <h3>Gemini Feedback</h3>
+                        <p>{geminiFeedback}</p>
+                        <button onClick={() => setGeminiFeedback(null)}>Close</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
