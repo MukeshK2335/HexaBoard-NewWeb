@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import '../../Style/FresherDashboard.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { db } from "../../firebase";
-import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where, updateDoc, addDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../../firebase";
 import LoadingScreen from "../LoadingScreen.jsx";
@@ -247,32 +247,79 @@ const Dashboard = () => {
                     {assignments.map((assignment) => (
                         <li key={assignment.id} className="assignment-item">
                             <h5>{assignment.courseTitle}</h5>
-                            <p>Status: <span className={`assignment-status ${assignment.status}`}>{assignment.status}</span></p>
+                            <p>Status: <span className={`assignment-status ${assignment.status.toLowerCase()}`}>{assignment.status}</span></p>
                             {assignment.dueDate && <p>Due: {formatDate(assignment.dueDate)}</p>}
-                            <button
-                                className="take-assessment-btn"
-                                onClick={async () => {
-                                    try {
-                                        console.log("Attempting to find assessment for courseId:", assignment.courseId);
-                                        const assessmentsQuery = query(collection(db, 'assessments'), where("courseId", "==", assignment.courseId));
-                                        const querySnapshot = await getDocs(assessmentsQuery);
-                                        
-                                        if (!querySnapshot.empty) {
-                                            const assessmentId = querySnapshot.docs[0].id;
-                                            console.log("Found assessmentId:", assessmentId, "for courseId:", assignment.courseId);
-                                            navigate(`/take-assessment/${assessmentId}`);
-                                        } else {
-                                            console.warn("No assessment found for courseId:", assignment.courseId);
-                                            alert("No assessment found for this course.");
+                            {assignment.marks && <p>Score: <span className="assignment-score">{assignment.marks}%</span></p>}
+                            {assignment.status !== "Completed" && (
+                                <button
+                                    className="take-assessment-btn"
+                                    onClick={async () => {
+                                        try {
+                                            console.log("Attempting to find assessment for courseId:", assignment.courseId);
+                                            const assessmentsQuery = query(collection(db, 'assessments'), where("courseId", "==", assignment.courseId));
+                                            const querySnapshot = await getDocs(assessmentsQuery);
+                                            
+                                            if (!querySnapshot.empty) {
+                                                const assessmentDoc = querySnapshot.docs[0];
+                                                const assessmentId = assessmentDoc.id;
+                                                const assessmentData = assessmentDoc.data();
+                                                
+                                                // Check if courseTitle exists in the assessment document
+                                                if (!assessmentData.courseTitle) {
+                                                    // Update the assessment document with courseTitle if it's missing
+                                                    console.log("Adding courseTitle to assessment document:", assignment.courseTitle);
+                                                    await updateDoc(doc(db, 'assessments', assessmentId), {
+                                                        courseTitle: assignment.courseTitle
+                                                    });
+                                                }
+                                                
+                                                console.log("Found assessmentId:", assessmentId, "for courseId:", assignment.courseId);
+                                                navigate(`/take-assessment/${assessmentId}`);
+                                            } else {
+                                                console.log("Creating new assessment for courseId:", assignment.courseId);
+                                                // Create a new assessment if one doesn't exist
+                                                try {
+                                                    // Create a basic assessment with default questions
+                                                    const newAssessment = {
+                                                        title: `Assessment for ${assignment.courseTitle}`,
+                                                        courseId: assignment.courseId,
+                                                        courseTitle: assignment.courseTitle,
+                                                        type: 'Quiz',
+                                                        duration: 30,
+                                                        passingScore: 70,
+                                                        isActive: true,
+                                                        createdAt: new Date(),
+                                                        totalQuestions: 5,
+                                                        totalPoints: 5,
+                                                        questions: [
+                                                            {
+                                                                id: Date.now(),
+                                                                question: `What is the main focus of ${assignment.courseTitle}?`,
+                                                                type: 'multiple-choice',
+                                                                options: ['Learning core concepts', 'Practical application', 'Historical background', 'Advanced techniques'],
+                                                                correctAnswer: 0,
+                                                                points: 1
+                                                            }
+                                                        ]
+                                                    };
+                                                    
+                                                    const newAssessmentRef = await addDoc(collection(db, 'assessments'), newAssessment);
+                                                    console.log("Created new assessment with ID:", newAssessmentRef.id);
+                                                    navigate(`/take-assessment/${newAssessmentRef.id}`);
+                                                } catch (createError) {
+                                                    console.error("Error creating assessment:", createError);
+                                                    alert("Failed to create assessment. Please try again.");
+                                                }
+                                            }
+                                        } catch (error) {
+                                            console.error("Error fetching assessment for course:", assignment.courseId, error);
+                                            alert("Failed to load assessment. Please try again.");
                                         }
-                                    } catch (error) {
-                                        console.error("Error fetching assessment for course:", assignment.courseId, error);
-                                        alert("Failed to load assessment. Please try again.");
-                                    }
-                                }}
-                            >
-                                Take Assessment
-                            </button>
+                                    }}
+                                >
+                                    Take Assessment
+                                </button>
+                            )}
                         </li>
                     ))}
                 </ul>

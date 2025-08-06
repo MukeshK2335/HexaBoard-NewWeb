@@ -649,6 +649,68 @@
     background: #3730a3;
 }
 
+/* Assessment Summary Styles */
+.assessment-summary {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.summary-score {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.summary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.correct-answers, .wrong-answers, .total-questions {
+    font-size: 1.1em;
+    color: #475569;
+}
+
+.correct-answers .highlight {
+    color: #10b981;
+    font-weight: 700;
+}
+
+.wrong-answers .highlight {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.total-questions .highlight {
+    color: #6366f1;
+    font-weight: 700;
+}
+
+.summary-actions {
+    margin-top: 20px;
+}
+
+.view-feedback-btn {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.view-feedback-btn:hover {
+    background: #4f46e5;
+}
+
 /* New styles for AssessmentPage */
 .assessment-page {
     display: flex;

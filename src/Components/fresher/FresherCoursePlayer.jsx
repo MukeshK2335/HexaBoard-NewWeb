@@ -110,7 +110,14 @@ const FresherCoursePlayer = () => {
                             completedCoursesCount: increment(1)
                         });
                     } else {
-                        setNotification({ show: true, message: 'Assignment for this course already exists!' });
+                        // Check if any of the existing assignments are already completed
+                        const completedAssignments = querySnapshot.docs.filter(doc => doc.data().status === 'Completed');
+                        
+                        if (completedAssignments.length > 0) {
+                            setNotification({ show: true, message: 'You have already completed an assignment for this course!' });
+                        } else {
+                            setNotification({ show: true, message: 'Assignment for this course already exists!' });
+                        }
                     }
 
                     setTimeout(() => {

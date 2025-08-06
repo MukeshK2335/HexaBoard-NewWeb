@@ -156,17 +156,30 @@ export const courseService = {
                 progress: 100 // Ensure progress is 100% when completed
             });
 
-            // Add a new assessment assignment
+            // Check if an assignment for this course already exists
             const assignmentsRef = collection(db, 'users', fresherId, 'assignments');
-            await addDoc(assignmentsRef, {
-                type: 'assessment',
-                courseId: courseId,
-                courseTitle: courseData.title, // Use the title of the completed course
-                status: 'pending',
-                assignedAt: new Date(),
-                dueDate: null, // You might want to set a due date
-                description: `Take the assessment for ${courseData.title}`,
-            });
+            const q = query(assignmentsRef, where('courseId', '==', courseId));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                // Add a new assessment assignment only if one doesn't exist
+                await addDoc(assignmentsRef, {
+                    type: 'assessment',
+                    courseId: courseId,
+                    courseTitle: courseData.title, // Use the title of the completed course
+                    status: 'pending',
+                    assignedAt: new Date(),
+                    dueDate: null, // You might want to set a due date
+                    description: `Take the assessment for ${courseData.title}`,
+                });
+            } else {
+                // Check if any of the existing assignments are already completed
+                const completedAssignments = querySnapshot.docs.filter(doc => doc.data().status === 'Completed');
+                
+                // If there's no completed assignment, we don't need to do anything
+                // The existing pending assignment will be used
+                console.log(`Assignment for course ${courseId} already exists. No new assignment created.`);
+            }
 
             return { success: true };
         } catch (error) {

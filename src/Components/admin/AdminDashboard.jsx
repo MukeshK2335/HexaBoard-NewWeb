@@ -3,10 +3,9 @@ import React, { useState, useEffect } from 'react';
 import '../../Style/AdminDashboard.css';
 import FresherSearch from './FresherSearch';
 import Reports from './Reports';
-import AgentStatus from './AgentStatus';
 import CourseManagement from './CourseManagement';
 import DepartmentManagement from './DepartmentManagement';
-import ChatbotAnalytics from './ChatbotAnalytics';
+import CsvUpload from './CsvUpload';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -104,18 +103,17 @@ const AdminDashboard = () => {
             });
     }, []);
 
-    // Fetch submissions count using Cloud Function
+    // Fetch submissions count from Firestore
     useEffect(() => {
-        const functions = getFunctions();
-        const getSubmissionsCount = httpsCallable(functions, 'getSubmissionsCount');
+        // Set up real-time listener for submissions collection
+        const submissionsRef = collection(db, 'submissions');
+        const unsubscribe = onSnapshot(submissionsRef, (snapshot) => {
+            setSubmissionsCount(snapshot.size);
+        }, (error) => {
+            console.error("Error fetching submissions count:", error);
+        });
 
-        getSubmissionsCount()
-            .then((result) => {
-                setSubmissionsCount(result.data.count);
-            })
-            .catch((error) => {
-                console.error("Error fetching submissions count:", error);
-            });
+        return () => unsubscribe();
     }, []);
 
     // Fetch active users count using Cloud Function
@@ -245,14 +243,10 @@ const handleAddFresher = async (fresher) => {
                 return <FresherSearch onAddFresher={handleAddFresher} />;
             case 'reports':
                 return <Reports />;
-            case 'agent':
-                return <AgentStatus />;
             case 'courses':
                 return <CourseManagement />;
             case 'departments':
                 return <DepartmentManagement />;
-            case 'chatbot':
-                return <ChatbotAnalytics />;
             case 'csv-upload':
                 return <CsvUpload />;
             case 'settings':
@@ -377,10 +371,8 @@ const handleAddFresher = async (fresher) => {
                         <li className={selectedTab === 'dashboard' ? 'active' : ''} onClick={() => { setSelectedTab('dashboard'); setIsSidebarOpen(false); }}>Dashboard</li>
                         <li className={selectedTab === 'fresher' ? 'active' : ''} onClick={() => { setSelectedTab('fresher'); setIsSidebarOpen(false); }}>Fresher Search</li>
                         <li className={selectedTab === 'reports' ? 'active' : ''} onClick={() => { setSelectedTab('reports'); setIsSidebarOpen(false); }}>Reports</li>
-                        <li className={selectedTab === 'agent' ? 'active' : ''} onClick={() => { setSelectedTab('agent'); setIsSidebarOpen(false); }}>Agent Status</li>
                         <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => { setSelectedTab('courses'); setIsSidebarOpen(false); }}>Course Management</li>
                         <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => { setSelectedTab('departments'); setIsSidebarOpen(false); }}>Department Management</li>
-                        <li className={selectedTab === 'chatbot' ? 'active' : ''} onClick={() => { setSelectedTab('chatbot'); setIsSidebarOpen(false); }}>Chatbot Analytics</li>
                         
                         <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => { setSelectedTab('settings'); setIsSidebarOpen(false); }}>Settings</li>
                     </ul>

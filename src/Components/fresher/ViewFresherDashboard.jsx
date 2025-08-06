@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../../Style/ViewFresherDashboard.css';
-import { Home, User, FileText } from 'lucide-react';
+import { Home, User, FileText, BookOpen, CheckSquare } from 'lucide-react';
 import { db } from '../../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import FresherProfile from '../fresher/FresherProfile.jsx';
 import { auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const ViewFresherDashboard = () => {
     const { id } = useParams();
     const [fresher, setFresher] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [courses, setCourses] = useState([]);
+    const [assignments, setAssignments] = useState([]);
+    const [dashboardData, setDashboardData] = useState({
+        activeCourses: 0,
+        completedCourses: 0,
+        pendingAssignments: 0,
+        completedAssignments: 0
+    });
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchFresher = async () => {
+        const fetchFresherData = async () => {
             setLoading(true);
             if (!id) {
                 console.error("Fresher ID is undefined.");
@@ -25,26 +34,53 @@ const ViewFresherDashboard = () => {
                 return;
             }
             try {
+                // Fetch fresher profile
                 const docRef = doc(db, 'users', id);
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
-                    setFresher({
+                    const fresherData = {
                         uid: docSnap.id,
                         ...docSnap.data()
+                    };
+                    setFresher(fresherData);
+                    
+                    // Fetch courses
+                    const coursesRef = collection(db, 'users', id, 'courses');
+                    const coursesSnap = await getDocs(coursesRef);
+                    const coursesData = coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setCourses(coursesData);
+                    
+                    // Fetch assignments
+                    const assignmentsRef = collection(db, 'users', id, 'assignments');
+                    const assignmentsSnap = await getDocs(assignmentsRef);
+                    const assignmentsData = assignmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setAssignments(assignmentsData);
+                    
+                    // Calculate dashboard metrics
+                    const activeCoursesCount = coursesData.filter(course => !course.completed).length;
+                    const completedCoursesCount = coursesData.filter(course => course.completed).length;
+                    const pendingAssignmentsCount = assignmentsData.filter(a => a.status !== 'Completed').length;
+                    const completedAssignmentsCount = assignmentsData.length - pendingAssignmentsCount;
+                    
+                    setDashboardData({
+                        activeCourses: activeCoursesCount,
+                        completedCourses: completedCoursesCount,
+                        pendingAssignments: pendingAssignmentsCount,
+                        completedAssignments: completedAssignmentsCount
                     });
                 } else {
                     setFresher(null);
                 }
             } catch (error) {
-                console.error('Error fetching fresher:', error);
+                console.error('Error fetching fresher data:', error);
                 setFresher(null);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchFresher();
+        fetchFresherData();
     }, [id]);
 
     return (
@@ -72,9 +108,21 @@ const ViewFresherDashboard = () => {
                         </button>
                     </li>
                     <li>
-                        <button className="sidebar-link" disabled>
-                            <FileText size={18} />
-                            Reports
+                        <button
+                            className={`sidebar-link ${activeTab === 'courses' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('courses')}
+                        >
+                            <BookOpen size={18} />
+                            Courses
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`sidebar-link ${activeTab === 'assignments' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('assignments')}
+                        >
+                            <CheckSquare size={18} />
+                            Assignments
                         </button>
                     </li>
                 </ul>
@@ -88,6 +136,48 @@ const ViewFresherDashboard = () => {
                     <h2>Fresher not found</h2>
                 ) : activeTab === 'profile' ? (
                     <FresherProfile fresher={fresher} />
+                ) : activeTab === 'courses' ? (
+                    // Courses content
+                    <div className="fresher-courses">
+                        <h2>Courses for {fresher.name}</h2>
+                        {courses.length === 0 ? (
+                            <p>No courses assigned yet.</p>
+                        ) : (
+                            <div className="courses-grid">
+                                {courses.map(course => (
+                                    <div key={course.id} className="course-card">
+                                        <h3>{course.title}</h3>
+                                        <p><strong>Progress:</strong> {course.progress || 0}%</p>
+                                        <p><strong>Status:</strong> {course.completed ? 'Completed' : 'In Progress'}</p>
+                                        {course.lastAccessed && (
+                                            <p><strong>Last Accessed:</strong> {new Date(course.lastAccessed.seconds * 1000).toLocaleDateString()}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                ) : activeTab === 'assignments' ? (
+                    // Assignments content
+                    <div className="fresher-assignments">
+                        <h2>Assignments for {fresher.name}</h2>
+                        {assignments.length === 0 ? (
+                            <p>No assignments yet.</p>
+                        ) : (
+                            <div className="assignments-list">
+                                {assignments.map(assignment => (
+                                    <div key={assignment.id} className="assignment-card">
+                                        <h3>{assignment.courseTitle || 'Assignment'}</h3>
+                                        <p><strong>Status:</strong> <span className={`status-badge ${assignment.status?.toLowerCase()}`}>{assignment.status || 'Pending'}</span></p>
+                                        {assignment.marks && <p><strong>Score:</strong> {assignment.marks}%</p>}
+                                        {assignment.submittedOn && (
+                                            <p><strong>Submitted:</strong> {new Date(assignment.submittedOn.seconds * 1000).toLocaleDateString()}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 ) : (
                     // Dashboard content here
                     <div className="fresher-dashboard">
@@ -99,27 +189,45 @@ const ViewFresherDashboard = () => {
                             <p><strong>Status:</strong> {fresher.status || 'N/A'}</p>
                         </div>
 
-                        <div className="training-status-section">
-                            <h3>Training Progress</h3>
-                            <div className="training-grid">
-                                <div className="status-card">
-                                    <p>Daily Quiz Status:</p>
-                                    <span>{fresher.quizStatus || 'N/A'}</span>
-                                </div>
-                                <div className="status-card">
-                                    <p>Coding Challenge:</p>
-                                    <span>{fresher.challengeProgress || 'N/A'}</span>
-                                </div>
-                                <div className="status-card">
-                                    <p>Assignment Submission:</p>
-                                    <span>{fresher.assignmentStatus || 'N/A'}</span>
-                                </div>
-                                <div className="status-card">
-                                    <p>Certification:</p>
-                                    <span>{fresher.certificationStatus || 'N/A'}</span>
-                                </div>
+                        {/* Stats Cards */}
+                        <div className="stats-cards">
+                            <div className="stat-card">
+                                <h4>Active Courses</h4>
+                                <p className="stat-count">{dashboardData.activeCourses}</p>
+                            </div>
+                            <div className="stat-card">
+                                <h4>Completed Courses</h4>
+                                <p className="stat-count">{dashboardData.completedCourses}</p>
+                            </div>
+                            <div className="stat-card">
+                                <h4>Pending Assignments</h4>
+                                <p className="stat-count">{dashboardData.pendingAssignments}</p>
+                            </div>
+                            <div className="stat-card">
+                                <h4>Completed Assignments</h4>
+                                <p className="stat-count">{dashboardData.completedAssignments}</p>
                             </div>
                         </div>
+
+                        {/* Assignment Progress Chart */}
+                        {assignments.length > 0 && (
+                            <div className="chart-section">
+                                <h3>Assignment Progress</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={[
+                                        { name: 'Pending', value: dashboardData.pendingAssignments },
+                                        { name: 'Completed', value: dashboardData.completedAssignments }
+                                    ]}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="name" />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Bar dataKey="value" fill="#4F46E5" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

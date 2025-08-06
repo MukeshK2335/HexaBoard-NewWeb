@@ -104,8 +104,12 @@ const AssessmentManager = () => {
         }
 
         try {
+            // Get the course title for the selected courseId
+            const courseTitle = getCourseTitle(newAssessment.courseId);
+            
             await addDoc(collection(db, 'assessments'), {
                 ...newAssessment,
+                courseTitle: courseTitle, // Store the course title in the assessment document
                 createdAt: serverTimestamp(),
                 totalQuestions: newAssessment.questions.length,
                 totalPoints: newAssessment.questions.reduce((sum, q) => sum + q.points, 0)
