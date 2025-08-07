@@ -2,13 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import '../../Style/FresherDashboard.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { db } from "../../firebase";
-import { doc, getDoc, collection, getDocs, query, where, updateDoc, addDoc } from "firebase/firestore";
+import { db, auth } from "../../firebase";
+import { doc, getDoc, collection, getDocs, query, where, updateDoc, addDoc, arrayUnion, setDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../../firebase";
 import LoadingScreen from "../LoadingScreen.jsx";
 import MyCourses from "./MyCourses.jsx";
 import Chatbot from "./Chatbot.jsx";
+import { FaHome, FaBook, FaTasks, FaBullseye } from "react-icons/fa";
 
 // Helper to format Firestore Timestamp or string
 function formatDate(ts) {
@@ -32,11 +32,44 @@ const Dashboard = () => {
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'dashboard');
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [geminiFeedback, setGeminiFeedback] = useState(null); // New state for Gemini feedback
+    // Sidebar is now always visible
     const dropdownRef = useRef(null);
 
     // Handles user logout
     const handleLogout = async () => {
         try {
+            const user = auth.currentUser;
+            if (user) {
+                const userRef = doc(db, 'users', user.uid);
+                
+                // Check if the user document exists and has loginActivity structure
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    
+                    if (!userData.loginActivity) {
+                        // Initialize loginActivity structure if it doesn't exist
+                        await updateDoc(userRef, {
+                            lastLogoutTime: new Date().toISOString(),
+                            loginActivity: {
+                                weeklyLogins: [{
+                                    loginTime: user.metadata.lastSignInTime,
+                                    logoutTime: new Date().toISOString()
+                                }]
+                            }
+                        });
+                    } else {
+                        // Update existing loginActivity
+                        await updateDoc(userRef, {
+                            lastLogoutTime: new Date().toISOString(),
+                            'loginActivity.weeklyLogins': arrayUnion({
+                                loginTime: user.metadata.lastSignInTime,
+                                logoutTime: new Date().toISOString()
+                            })
+                        });
+                    }
+                }
+            }
             await signOut(auth);
             navigate("/"); // Navigate to home or login page after logout
         } catch (error) {
@@ -72,6 +105,29 @@ const Dashboard = () => {
 
             if (user) {
                 try {
+                    // Update login time when user logs in
+                    const userRef = doc(db, "users", user.uid);
+                    
+                    // First check if the user document exists and has loginActivity structure
+                    const userDoc = await getDoc(userRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (!userData.loginActivity) {
+                            // Initialize loginActivity structure if it doesn't exist
+                            await updateDoc(userRef, {
+                                lastLoginTime: new Date().toISOString(),
+                                loginActivity: {
+                                    weeklyLogins: []
+                                }
+                            });
+                        } else {
+                            // Just update the lastLoginTime
+                            await updateDoc(userRef, {
+                                lastLoginTime: new Date().toISOString()
+                            });
+                        }
+                    }
+
                     // Fetch user profile data and other collections concurrently
                     const [
                         userSnap,
@@ -195,6 +251,11 @@ const Dashboard = () => {
                     <h4>Completed Courses</h4>
                     <p className="count">{data.completedCourses}</p>
                 </div>
+                <div className="card daily-quiz-card" onClick={() => navigate('/fresher/daily-quiz')}>
+                    <h4>Daily Quiz</h4>
+                    <p className="quiz-icon">🎯</p>
+                    <span className="info">Test your knowledge daily!</span>
+                </div>
             </section>
 
             {/* Assignment Marks Chart */}
@@ -202,7 +263,7 @@ const Dashboard = () => {
                 <div className="progress-header">
                     <h4>Assignment Marks Progress</h4>
                 </div>
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={400}>
                     {assignments && assignments.length > 0 ? (
                         <BarChart data={assignments} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" />
@@ -346,6 +407,7 @@ const Dashboard = () => {
                             className={activeTab === 'dashboard' ? 'active' : ''}
                             onClick={() => setActiveTab('dashboard')}
                         >
+                            <span className="nav-icon"><FaHome /></span>
                             Dashboard
                         </a>
                         <a
@@ -353,15 +415,23 @@ const Dashboard = () => {
                             className={activeTab === 'courses' ? 'active' : ''}
                             onClick={() => setActiveTab('courses')}
                         >
+                            <span className="nav-icon"><FaBook /></span>
                             My Courses
                         </a>
-                        <a href="#">Daily Quiz</a>
                         <a
                             href="#"
                             className={activeTab === 'assignments' ? 'active' : ''}
                             onClick={() => setActiveTab('assignments')}
                         >
+                            <span className="nav-icon"><FaTasks /></span>
                             Assignments
+                        </a>
+                        <a
+                            href="/fresher/daily-quiz"
+                            className="daily-quiz-link"
+                        >
+                            <span className="nav-icon"><FaBullseye /></span>
+                            Daily Quiz
                         </a>
                     </nav>
                 </aside>
@@ -369,7 +439,7 @@ const Dashboard = () => {
                 {/* Main */}
                 <main className="main-content">
                     <header className="topbar">
-                        <h2>{activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'courses' ? 'My Learning' : 'Assignments'}</h2>
+                        <h2>{activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'courses' ? 'My Learning' : activeTab === 'assignments' ? 'Assignments' : 'Dashboard'}</h2>
                         <div className="user-dropdown" ref={dropdownRef}>
                             <span className="user-name" onClick={() => setDropdownOpen(!dropdownOpen)}>
                                 {userName} ▾

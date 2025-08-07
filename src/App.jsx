@@ -10,6 +10,7 @@ import CourseDetailView from './Components/fresher/CourseDetailView.jsx';
 import FresherCoursePlayer from './Components/fresher/FresherCoursePlayer.jsx';
 import MyCourses from './Components/fresher/MyCourses.jsx';
 import AssessmentPage from './Components/assessments/AssessmentPage.jsx';
+import DailyQuiz from './Components/fresher/DailyQuiz.jsx';
 import './App.css';
 
 function App() {
@@ -82,6 +83,13 @@ function App() {
                 <Route path="/take-assessment/:assessmentId" element={
                     <ProtectedRoute>
                         <AssessmentPage />
+                    </ProtectedRoute>
+                } />
+                
+                {/* Daily Quiz Route */}
+                <Route path="/fresher/daily-quiz" element={
+                    <ProtectedRoute>
+                        <DailyQuiz />
                     </ProtectedRoute>
                 } />
             </Routes>

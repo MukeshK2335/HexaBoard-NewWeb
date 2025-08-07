@@ -66,7 +66,10 @@ const FresherSearch = ({ onAddFresher }) => {
             }
             // Filter by department
             if (filters.department) {
-                freshers = freshers.filter(f => f.department === filters.department);
+                freshers = freshers.filter(f => 
+                    f.department === filters.department || 
+                    f.departmentName === filters.department
+                );
             }
             // Filter by skill
             if (filters.skill) {
@@ -146,11 +149,16 @@ const FresherSearch = ({ onAddFresher }) => {
                         <option value="">Department</option>
                         <option value="IT">IT</option>
                         <option value="HR">HR</option>
+                        <option value="Support">Support</option>
                     </select>
                     <select name="skill" onChange={handleSearchChange}>
                         <option value="">Skill</option>
                         <option value="Java">Java</option>
                         <option value="React">React</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Python">Python</option>
+                        <option value="HTML/CSS">HTML/CSS</option>
+                        <option value="Node.js">Node.js</option>
                     </select>
                     <select name="status" onChange={handleSearchChange}>
                         <option value="">Status</option>
@@ -169,11 +177,11 @@ const FresherSearch = ({ onAddFresher }) => {
                         {results.map(f => (
                             <div key={f.id} className="fresher-card" style={{boxShadow: '0 2px 8px #e5e7eb', borderRadius: 12, padding: 20, background: '#fff', maxWidth: 400}}>
                                 <div style={{fontWeight: 600, fontSize: '1.1rem', marginBottom: 8}}>{f.name}</div>
-                                <div style={{marginBottom: 4}}><strong>Email:</strong> {f.email}</div>
-                                <div style={{marginBottom: 4}}><strong>Department:</strong> {f.department}</div>
+                                <div style={{marginBottom: 4}}><strong>Email:</strong> {f.email || '-'}</div>
+                                <div style={{marginBottom: 4}}><strong>Department:</strong> {f.department || f.departmentName || '-'}</div>
                                 <div style={{marginBottom: 4}}><strong>Skill:</strong> {Array.isArray(f.skills) ? f.skills.join(', ') : (f.skill || '-')}</div>
                                 <div style={{marginBottom: 4}}><strong>Status:</strong> {f.status || '-'}</div>
-                                <div style={{marginBottom: 8}}><strong>Start Date:</strong> {f.startDate || '-'}</div>
+                                <div style={{marginBottom: 8}}><strong>Start Date:</strong> {f.startDate ? new Date(f.startDate).toLocaleDateString() : '-'}</div>
                                 <button onClick={() => navigate(`/admin/fresher/${f.id}`)} style={{background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer'}}>View</button>
                                 <button onClick={() => handleResetProgress(f.id)} style={{background: '#dc3545', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer', marginLeft: '10px'}}>Reset Progress</button>
                                 <button onClick={() => handleDeleteFresher(f.id, f.email)} style={{background: '#dc3545', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, cursor: 'pointer', marginLeft: '10px'}}>Delete</button>

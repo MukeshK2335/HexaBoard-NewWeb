@@ -135,7 +135,7 @@ const ViewFresherDashboard = () => {
                 ) : !fresher ? (
                     <h2>Fresher not found</h2>
                 ) : activeTab === 'profile' ? (
-                    <FresherProfile fresher={fresher} />
+                    <FresherProfile fresher={fresher} assignments={assignments} />
                 ) : activeTab === 'courses' ? (
                     // Courses content
                     <div className="fresher-courses">
@@ -147,10 +147,24 @@ const ViewFresherDashboard = () => {
                                 {courses.map(course => (
                                     <div key={course.id} className="course-card">
                                         <h3>{course.title}</h3>
-                                        <p><strong>Progress:</strong> {course.progress || 0}%</p>
-                                        <p><strong>Status:</strong> {course.completed ? 'Completed' : 'In Progress'}</p>
+                                        <p>
+                                            <strong>Progress:</strong>
+                                            <span className="progress-indicator">
+                                                <span className="progress-bar" style={{ width: `${course.progress || 0}%` }}></span>
+                                                <span className="progress-text">{course.progress || 0}%</span>
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <strong>Status:</strong>
+                                            <span className={`status-badge ${course.completed ? 'completed' : 'pending'}`}>
+                                                {course.completed ? 'Completed' : 'In Progress'}
+                                            </span>
+                                        </p>
                                         {course.lastAccessed && (
-                                            <p><strong>Last Accessed:</strong> {new Date(course.lastAccessed.seconds * 1000).toLocaleDateString()}</p>
+                                            <p>
+                                                <strong>Last Accessed:</strong>
+                                                <span>{new Date(course.lastAccessed.seconds * 1000).toLocaleDateString()}</span>
+                                            </p>
                                         )}
                                     </div>
                                 ))}
@@ -168,10 +182,23 @@ const ViewFresherDashboard = () => {
                                 {assignments.map(assignment => (
                                     <div key={assignment.id} className="assignment-card">
                                         <h3>{assignment.courseTitle || 'Assignment'}</h3>
-                                        <p><strong>Status:</strong> <span className={`status-badge ${assignment.status?.toLowerCase()}`}>{assignment.status || 'Pending'}</span></p>
-                                        {assignment.marks && <p><strong>Score:</strong> {assignment.marks}%</p>}
+                                        <p>
+                                            <strong>Status:</strong> 
+                                            <span className={`status-badge ${assignment.status?.toLowerCase()}`}>
+                                                {assignment.status || 'Pending'}
+                                            </span>
+                                        </p>
+                                        {assignment.marks !== undefined && (
+                                            <p>
+                                                <strong>Score:</strong> 
+                                                <span className="result-score">{assignment.marks}%</span>
+                                            </p>
+                                        )}
                                         {assignment.submittedOn && (
-                                            <p><strong>Submitted:</strong> {new Date(assignment.submittedOn.seconds * 1000).toLocaleDateString()}</p>
+                                            <p>
+                                                <strong>Submitted:</strong> 
+                                                <span>{new Date(assignment.submittedOn.seconds * 1000).toLocaleDateString()}</span>
+                                            </p>
                                         )}
                                     </div>
                                 ))}

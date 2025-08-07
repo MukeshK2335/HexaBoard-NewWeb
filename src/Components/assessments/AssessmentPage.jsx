@@ -82,7 +82,7 @@ const AssessmentPage = () => {
                     
                     console.log("Using courseTitle for question generation:", courseTitle);
                     
-                    const prompt = `Generate 5 multiple-choice questions specifically and strictly about "${courseTitle}". Ensure all questions are directly related to this topic and avoid general knowledge. Each question should have 4 options (A, B, C, D) and indicate the correct answer. The output MUST be a JSON array of objects, and nothing else. Example: [{"question": "What is X?", "options": ["A", "B", "C", "D"], "correctAnswer": "A"}]`;
+                    const prompt = `Generate 15 multiple-choice questions difficult level is medium and hard specifically and strictly about "${courseTitle}". Ensure all questions are directly related to this topic and avoid general knowledge. Each question should have 4 options (A, B, C, D) and indicate the correct answer. The output MUST be a JSON array of objects, and nothing else. Example: [{"question": "What is X?", "options": ["A", "B", "C", "D"], "correctAnswer": "A"}]`;
                     
                     let generatedQuestions = [];
                     let success = false;
@@ -212,6 +212,8 @@ const AssessmentPage = () => {
         setShowSuccessAnimation(true);
         setTimeout(() => {
             setShowSuccessAnimation(false);
+            // Ensure we show the summary modal after the success animation
+            setShowSummary(true);
         }, 3000); // Hide after 3 seconds
 
         // Prepare data for Gemini feedback
@@ -225,27 +227,38 @@ const AssessmentPage = () => {
             // Get the text of the user's selected answer
             const userAnswerText = userAnswers[index] !== undefined ? q.options[userAnswers[index]] : 'Not Answered';
             
+            // Extract just the letter from the correct answer if it contains more than just the letter
+            let correctAnswer = q.correctAnswer.trim();
+            // If correctAnswer is just a single letter like "A", "B", etc.
+            const letterOnly = correctAnswer.match(/^[A-D]$/i);
+            
             // Find the index of the correct answer in the options array
-            // This is a more robust approach than direct string comparison
             let correctAnswerIndex = -1;
+            
+            // First try to find by exact match
             for (let i = 0; i < q.options.length; i++) {
-                if (q.options[i].trim() === q.correctAnswer.trim()) {
+                if (q.options[i].trim() === correctAnswer) {
                     correctAnswerIndex = i;
                     break;
                 }
             }
             
-            // Check if the user's selected index matches the correct answer index
-            const isCorrect = userAnswers[index] !== undefined && 
-                (userAnswerText.trim() === q.correctAnswer.trim() || 
-                 (correctAnswerIndex !== -1 && userAnswers[index] === correctAnswerIndex));
+            // If not found and correctAnswer is just a letter, try to find by index
+            if (correctAnswerIndex === -1 && letterOnly) {
+                // Convert letter to index (A=0, B=1, C=2, D=3)
+                correctAnswerIndex = correctAnswer.toUpperCase().charCodeAt(0) - 65;
+            }
             
-            console.log(`Question ${index}: User selected "${userAnswerText}" (index ${userAnswers[index]}), Correct answer: "${q.correctAnswer}" (index ${correctAnswerIndex}), isCorrect: ${isCorrect}`);
+            // Check if the user's selected index matches the correct answer index
+            const isCorrect = userAnswers[index] !== undefined && correctAnswerIndex !== -1 && 
+                userAnswers[index] === correctAnswerIndex;
+            
+            console.log(`Question ${index}: User selected "${userAnswerText}" (index ${userAnswers[index]}), Correct answer: "${correctAnswer}" (index ${correctAnswerIndex}), isCorrect: ${isCorrect}`);
             
             return {
                 question: q.question,
                 options: q.options,
-                correctAnswer: q.correctAnswer,
+                correctAnswer: correctAnswer,
                 correctAnswerIndex: correctAnswerIndex,
                 userAnswer: userAnswerText,
                 userAnswerIndex: userAnswers[index],
@@ -434,10 +447,12 @@ Great job on taking this step in your learning journey!`;
             }
             
             setGeminiFeedback(feedbackText);
-            setShowSummary(true);
+            // We've already set showSummary to true after the success animation
+            // This ensures the results are shown immediately after clicking finish
         } catch (err) {
             console.error("Error in feedback generation process:", err);
             setGeminiFeedback(feedbackText); // Use the fallback feedback
+            // Make sure we show the summary even if there's an error with feedback generation
             setShowSummary(true);
         } finally {
             // Don't navigate immediately - we'll navigate after the user views the feedback

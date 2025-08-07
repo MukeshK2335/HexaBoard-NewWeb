@@ -13,7 +13,6 @@ import {
     getDoc
 } from 'firebase/firestore';
 
-// IMPORTANT: Replace "YOUR_API_KEY" with your actual Gemini API key
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 // Chatbot Service for advanced functionality
@@ -58,7 +57,7 @@ export const chatbotService = {
                     const deptDoc = await getDoc(doc(db, 'departments', userData.departmentId));
                     if (deptDoc.exists()) {
                         return { id: deptDoc.id, ...deptDoc.data() };
-                    }
+                    } 
                 }
             }
             return null;

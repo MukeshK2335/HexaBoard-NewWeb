@@ -20,22 +20,7 @@ body {
     width: 100%;
 }
 
-.layout-wrapper.sidebar-hidden .sidebar {
-    width: 0;
-    padding: 0;
-    overflow: hidden;
-    transition: width 0.3s ease, padding 0.3s ease;
-}
-
-.layout-wrapper.sidebar-hidden .sidebar .logo,
-.layout-wrapper.sidebar-hidden .sidebar .nav-links {
-    display: none;
-}
-
-.layout-wrapper.sidebar-hidden .main-content {
-    margin-left: 0;
-    width: 100%;
-}
+/* Removed sidebar-hidden styles as sidebar is now always visible */
 
 @media (max-width: 768px) {
     .layout-wrapper {
@@ -46,12 +31,18 @@ body {
 /* Sidebar / Navbar */
 .sidebar {
     width: 240px;
-    background-color: #3f3dff;
+    background-color: #d0d0e0;
     color: white;
     display: flex;
     flex-direction: column;
     padding: 24px 16px;
     transition: width 0.3s ease, padding 0.3s ease;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0px;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .main-content {
@@ -59,6 +50,8 @@ body {
     padding: 24px 40px;
     overflow-y: auto;
     transition: margin-left 0.3s ease, width 0.3s ease;
+    margin-left: 240px; /* Match sidebar width */
+    width: calc(100% - 240px);
 }
 
 .logo {
@@ -80,6 +73,16 @@ body {
     padding: 10px 14px;
     border-radius: 8px;
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
 }
 
 .nav-links a.active,
@@ -88,39 +91,100 @@ body {
     font-weight: 600;
 }
 
+.nav-links a.daily-quiz-link {
+    background-color: #fef3c7;
+    color: #92400e;
+    font-weight: 600;
+    margin-top: 10px;
+    border: 2px solid #fde68a;
+    transition: all 0.3s ease;
+}
+
+.nav-links a.daily-quiz-link:hover {
+    background-color: #5a57ff;
+    color: #78350f;
+}
+
+/* Media query for screens less than 773px × 1108px */
+@media (max-width: 1108px) {
+    /* Topbar styles */
+    .topbar {
+        display: flex;
+        align-items: center;
+    }
+    
+    .topbar h2 {
+        flex: 1;
+    }
+    
+    /* Sidebar remains fixed */
+    .sidebar {
+        width: 240px;
+        z-index: 1000;
+    }
+    
+    /* Main content adjustments */
+    .main-content {
+        margin-left: 240px;
+        width: calc(100% - 240px);
+        box-sizing: border-box;
+        padding: 24px 20px;
+    }
+}
+
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        padding: 12px 10px;
+        width: 240px;
+        flex-direction: column;
+        padding: 20px 16px;
         position: fixed;
         top: 0;
         left: 0;
-        height: auto;
+        height: 100vh;
         z-index: 999;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
     .nav-links {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 12px;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
     }
 
     .nav-links a {
-        padding: 8px 12px;
-        font-size: 15px;
-        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 16px;
+        border-radius: 8px;
+        min-height: 44px; /* Improve touch target size */
+        display: flex;
+        align-items: center;
     }
 
     .main-content {
-        padding-top: 70px;
+        margin-left: 240px;
+        width: calc(100% - 240px);
+        box-sizing: border-box;
+        padding: 24px 20px;
     }
 
     .logo {
-        display: none;
+        display: block;
+        font-size: 20px;
+        margin-bottom: 24px;
     }
+    
+    /* Ensure all buttons have proper touch targets */
+    button {
+        min-height: 44px;
+    }
+    
+    /* Ensure images are responsive */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Removed sidebar-hidden styles for mobile as sidebar is now always visible */
 }
 
 /* Main Content */
@@ -138,6 +202,9 @@ body {
     margin-bottom: 24px;
 }
 
+/* Sidebar toggle button - removed as sidebar is now always visible */
+/* .sidebar-toggle styles removed */
+
 @media (max-width: 768px) {
     .topbar {
         flex-direction: column;
@@ -150,29 +217,30 @@ body {
 .welcome-card {
     background: linear-gradient(to right, #6366f1, #8b5cf6);
     color: white;
-    padding: 24px;
+    padding: 32px;
     border-radius: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
 .welcome-card h3 {
-    margin: 0 0 6px;
-    font-size: 20px;
+    margin: 0 0 8px;
+    font-size: 24px;
 }
 
 .welcome-card button {
     background-color: white;
     color: #4f46e5;
     border: none;
-    padding: 10px 18px;
+    padding: 12px 22px;
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
     transition: 0.2s;
+    font-size: 16px;
 }
 
 .welcome-card button:hover {
@@ -190,15 +258,15 @@ body {
 /* Cards */
 .cards {
     display: flex;
-    gap: 20px;
+    gap: 25px;
     flex-wrap: wrap;
-    margin-bottom: 36px;
+    margin-bottom: 40px;
 }
 
 .card {
     background: linear-gradient(145deg, #ffffff, #f1f5f9);
     border-radius: 16px;
-    padding: 22px;
+    padding: 28px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
@@ -208,6 +276,8 @@ body {
     transition: all 0.3s ease;
     overflow: hidden;
     border-left: 5px solid #6366f1;
+    min-width: 220px;
+    flex: 1;
 }
 
 .card:hover {
@@ -217,17 +287,17 @@ body {
 }
 
 .card h4 {
-    font-size: 15px;
+    font-size: 17px;
     color: #6b7280;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .card .count {
-    font-size: 32px;
+    font-size: 38px;
     font-weight: bold;
     color: #111827;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .card .info {
@@ -235,34 +305,68 @@ body {
     color: #10b981;
 }
 
+.daily-quiz-card {
+    background: linear-gradient(145deg, #fef3c7, #fde68a);
+    border: 2px solid #fde68a;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.daily-quiz-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.daily-quiz-card h4 {
+    color: #92400e;
+}
+
+.daily-quiz-card .quiz-icon {
+    font-size: 32px;
+    margin: 5px 0;
+}
+
+.daily-quiz-card .info {
+    color: #78350f;
+    font-weight: 500;
+}
+
 /* Progress */
 .progress {
     background: white;
-    padding: 24px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    margin-bottom: 32px;
 }
 
 .progress-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     align-items: center;
+}
+
+.progress-header h4 {
+    font-size: 20px;
+    color: #374151;
+    font-weight: 600;
 }
 
 /* Certifications */
 .certifications {
     background: white;
-    margin-top: 30px;
-    padding: 24px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-top: 32px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .certifications h4 {
-    margin-bottom: 16px;
-    font-size: 18px;
+    margin-bottom: 20px;
+    font-size: 20px;
     color: #374151;
+    font-weight: 600;
 }
 
 .cert-list {
@@ -272,9 +376,9 @@ body {
 }
 
 .cert-list li {
-    padding: 10px 0;
+    padding: 14px 0;
     border-bottom: 1px solid #e5e7eb;
-    font-size: 15px;
+    font-size: 16px;
     color: #1f2937;
 }
 
@@ -1191,9 +1295,9 @@ body {
 .assignments-section {
     background: white;
     margin-top: 30px;
-    padding: 24px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .assignments-section h4 {
@@ -1336,4 +1440,114 @@ body {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+/* Schedule Modal */
+.schedule-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001; /* Higher z-index */
+    animation: fadeIn 0.3s ease-out;
+}
+
+.schedule-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    animation: fadeInScale 0.4s ease-out forwards;
+}
+
+.schedule-modal-content h3 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.schedule-modal-content .pending-tasks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.schedule-modal-content .pending-tasks li {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    opacity: 0;
+    animation: slideIn 0.5s ease-out forwards;
+}
+
+.schedule-modal-content .pending-tasks li:nth-child(1) { animation-delay: 0.2s; }
+.schedule-modal-content .pending-tasks li:nth-child(2) { animation-delay: 0.3s; }
+.schedule-modal-content .pending-tasks li:nth-child(3) { animation-delay: 0.4s; }
+/* Add more delays if needed */
+
+.schedule-modal-content .no-tasks {
+    font-size: 18px;
+    color: #555;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.schedule-modal-content .animated-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    animation: tada 1s ease-out;
+}
+
+.schedule-modal-content button {
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.schedule-modal-content button:hover {
+    background-color: #4f46e5;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes tada {
+    0% { transform: scale(1); }
+    10%, 20% { transform: scale(0.9) rotate(-3deg); }
+    30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+    40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0); }
 }

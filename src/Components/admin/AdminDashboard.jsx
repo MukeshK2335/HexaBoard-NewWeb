@@ -26,7 +26,7 @@ import adminpng from '../../assets/admin-logo.png';
 const AdminDashboard = () => {
     const [selectedTab, setSelectedTab] = useState('dashboard');
     const [loginLogs, setLoginLogs] = useState([]);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    
     const [freshersCount, setFreshersCount] = useState(0);
     const [coursesCount, setCoursesCount] = useState(0);
     const [submissionsCount, setSubmissionsCount] = useState(0);
@@ -36,9 +36,7 @@ const AdminDashboard = () => {
     const [freshersPerCourseData, setFreshersPerCourseData] = useState([]);
     const navigate = useNavigate();
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+    
 
     // Redirect if user is not authenticated or not admin
     useEffect(() => {
@@ -363,28 +361,24 @@ const handleAddFresher = async (fresher) => {
     };
 
     return (
-        <div className={`admin-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-            <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="admin-container sidebar-open">
+            <aside className="sidebar open">
                 <h2 className="sidebar-title">Admin Portal</h2>
                 <nav>
                     <ul>
-                        <li className={selectedTab === 'dashboard' ? 'active' : ''} onClick={() => { setSelectedTab('dashboard'); setIsSidebarOpen(false); }}>Dashboard</li>
-                        <li className={selectedTab === 'fresher' ? 'active' : ''} onClick={() => { setSelectedTab('fresher'); setIsSidebarOpen(false); }}>Fresher Search</li>
-                        <li className={selectedTab === 'reports' ? 'active' : ''} onClick={() => { setSelectedTab('reports'); setIsSidebarOpen(false); }}>Reports</li>
-                        <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => { setSelectedTab('courses'); setIsSidebarOpen(false); }}>Course Management</li>
-                        <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => { setSelectedTab('departments'); setIsSidebarOpen(false); }}>Department Management</li>
+                        <li className={selectedTab === 'dashboard' ? 'active' : ''} onClick={() => setSelectedTab('dashboard')}>Dashboard</li>
+                        <li className={selectedTab === 'fresher' ? 'active' : ''} onClick={() => setSelectedTab('fresher')}>Fresher Search</li>
+                        <li className={selectedTab === 'reports' ? 'active' : ''} onClick={() => setSelectedTab('reports')}>Reports</li>
+                        <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => setSelectedTab('courses')}>Course Management</li>
+                        <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => setSelectedTab('departments')}>Department Management</li>
                         
-                        <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => { setSelectedTab('settings'); setIsSidebarOpen(false); }}>Settings</li>
+                        <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => setSelectedTab('settings')}>Settings</li>
                     </ul>
                 </nav>
             </aside>
 
             <main className="main-content">
-                <div className="hamburger-menu" onClick={toggleSidebar}>
-                    <div className="bar"></div>
-                    <div className="bar"></div>
-                    <div className="bar"></div>
-                </div>
+                
                 {renderSection()}
             </main>
         </div>

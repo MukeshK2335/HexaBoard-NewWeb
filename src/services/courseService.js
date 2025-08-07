@@ -221,6 +221,89 @@ export const courseService = {
             console.error('Error in addFresherWithDepartmentAssignment:', error);
             return { success: false, error: error.message };
         }
+    },
+
+    async createDepartment(departmentData) {
+        try {
+            const departmentsRef = collection(db, 'departments');
+            await addDoc(departmentsRef, {
+                ...departmentData,
+                memberCount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('Error creating department:', error);
+            throw error;
+        }
+    },
+
+    async assignFresherToDepartment(fresherId, departmentId) {
+        try {
+            const fresherRef = doc(db, 'users', fresherId);
+            const departmentRef = doc(db, 'departments', departmentId);
+            
+            // Get current department data
+            const departmentDoc = await getDoc(departmentRef);
+            if (!departmentDoc.exists()) {
+                throw new Error('Department not found');
+            }
+            
+            const batch = writeBatch(db);
+            
+            // Update fresher document
+            batch.update(fresherRef, { 
+                departmentId: departmentId,
+                updatedAt: new Date()
+            });
+            
+            // Update department member count
+            batch.update(departmentRef, { 
+                memberCount: (departmentDoc.data().memberCount || 0) + 1,
+                updatedAt: new Date()
+            });
+            
+            await batch.commit();
+            return { success: true };
+        } catch (error) {
+            console.error('Error assigning fresher to department:', error);
+            throw error;
+        }
+    },
+
+    async removeFresherFromDepartment(fresherId, departmentId) {
+        try {
+            const fresherRef = doc(db, 'users', fresherId);
+            const departmentRef = doc(db, 'departments', departmentId);
+            
+            // Get current department data
+            const departmentDoc = await getDoc(departmentRef);
+            if (!departmentDoc.exists()) {
+                throw new Error('Department not found');
+            }
+            
+            const batch = writeBatch(db);
+            
+            // Update fresher document - remove departmentId
+            batch.update(fresherRef, { 
+                departmentId: null,
+                updatedAt: new Date()
+            });
+            
+            // Update department member count (ensure it doesn't go below 0)
+            const currentCount = departmentDoc.data().memberCount || 0;
+            batch.update(departmentRef, { 
+                memberCount: Math.max(0, currentCount - 1),
+                updatedAt: new Date()
+            });
+            
+            await batch.commit();
+            return { success: true };
+        } catch (error) {
+            console.error('Error removing fresher from department:', error);
+            throw error;
+        }
     }
 };
 
