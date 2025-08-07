@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../../Style/ViewFresherDashboard.css';
 import { Home, User, FileText, BookOpen, CheckSquare } from 'lucide-react';
+import { FaBars } from "react-icons/fa";
 import { db } from '../../firebase';
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import FresherProfile from '../fresher/FresherProfile.jsx';
@@ -23,6 +24,28 @@ const ViewFresherDashboard = () => {
         completedAssignments: 0
     });
     const navigate = useNavigate();
+    const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setSidebarOpen(false);
+            } else {
+                setSidebarOpen(true);
+            }
+        };
+        
+        // Set initial state
+        handleResize();
+        
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     useEffect(() => {
         const fetchFresherData = async () => {
@@ -84,15 +107,18 @@ const ViewFresherDashboard = () => {
     }, [id]);
 
     return (
-        <div className="dashboard-container">
+        <div className={`dashboard-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
+            <button className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                <FaBars />
+            </button>
             {/* Sidebar */}
-            <div className="sidebar">
+            <div className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
                 <div className="sidebar-header">HexaBoard</div>
                 <ul className="sidebar-menu">
                     <li>
                         <button
                             className={`sidebar-link ${activeTab === 'dashboard' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('dashboard')}
+                            onClick={() => { setActiveTab('dashboard'); if (window.innerWidth <= 768) setSidebarOpen(false); }}
                         >
                             <Home size={18} />
                             Dashboard
@@ -101,7 +127,7 @@ const ViewFresherDashboard = () => {
                     <li>
                         <button
                             className={`sidebar-link ${activeTab === 'profile' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('profile')}
+                            onClick={() => { setActiveTab('profile'); if (window.innerWidth <= 768) setSidebarOpen(false); }}
                         >
                             <User size={18} />
                             Profile
@@ -110,7 +136,7 @@ const ViewFresherDashboard = () => {
                     <li>
                         <button
                             className={`sidebar-link ${activeTab === 'courses' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('courses')}
+                            onClick={() => { setActiveTab('courses'); if (window.innerWidth <= 768) setSidebarOpen(false); }}
                         >
                             <BookOpen size={18} />
                             Courses
@@ -119,7 +145,7 @@ const ViewFresherDashboard = () => {
                     <li>
                         <button
                             className={`sidebar-link ${activeTab === 'assignments' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('assignments')}
+                            onClick={() => { setActiveTab('assignments'); if (window.innerWidth <= 768) setSidebarOpen(false); }}
                         >
                             <CheckSquare size={18} />
                             Assignments

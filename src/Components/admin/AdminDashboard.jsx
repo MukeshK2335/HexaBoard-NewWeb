@@ -22,10 +22,12 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 import adminpng from '../../assets/admin-logo.png';
+import { FaBars } from "react-icons/fa";
 
 const AdminDashboard = () => {
     const [selectedTab, setSelectedTab] = useState('dashboard');
     const [loginLogs, setLoginLogs] = useState([]);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
     
     const [freshersCount, setFreshersCount] = useState(0);
     const [coursesCount, setCoursesCount] = useState(0);
@@ -157,6 +159,28 @@ const AdminDashboard = () => {
             { name: 'Firebase Fundamentals', "Number of Freshers": 20 },
         ];
         setFreshersPerCourseData(sampleFreshersPerCourseData);
+    }, []);
+
+    // Handle sidebar visibility based on screen size
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setSidebarOpen(false);
+            } else {
+                setSidebarOpen(true);
+            }
+        };
+        
+        // Set initial state
+        handleResize();
+        
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
 
@@ -361,18 +385,21 @@ const handleAddFresher = async (fresher) => {
     };
 
     return (
-        <div className="admin-container sidebar-open">
-            <aside className="sidebar open">
+        <div className={`admin-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
+            <button className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                <FaBars />
+            </button>
+            <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
                 <h2 className="sidebar-title">Admin Portal</h2>
                 <nav>
                     <ul>
-                        <li className={selectedTab === 'dashboard' ? 'active' : ''} onClick={() => setSelectedTab('dashboard')}>Dashboard</li>
-                        <li className={selectedTab === 'fresher' ? 'active' : ''} onClick={() => setSelectedTab('fresher')}>Fresher Search</li>
-                        <li className={selectedTab === 'reports' ? 'active' : ''} onClick={() => setSelectedTab('reports')}>Reports</li>
-                        <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => setSelectedTab('courses')}>Course Management</li>
-                        <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => setSelectedTab('departments')}>Department Management</li>
+                        <li className={selectedTab === 'dashboard' ? 'active' : ''} onClick={() => { setSelectedTab('dashboard'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Dashboard</li>
+                        <li className={selectedTab === 'fresher' ? 'active' : ''} onClick={() => { setSelectedTab('fresher'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Fresher Search</li>
+                        <li className={selectedTab === 'reports' ? 'active' : ''} onClick={() => { setSelectedTab('reports'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Reports</li>
+                        <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => { setSelectedTab('courses'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Course Management</li>
+                        <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => { setSelectedTab('departments'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Department Management</li>
                         
-                        <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => setSelectedTab('settings')}>Settings</li>
+                        <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => { setSelectedTab('settings'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Settings</li>
                     </ul>
                 </nav>
             </aside>

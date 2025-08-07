@@ -8,7 +8,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoadingScreen from "../LoadingScreen.jsx";
 import MyCourses from "./MyCourses.jsx";
 import Chatbot from "./Chatbot.jsx";
-import { FaHome, FaBook, FaTasks, FaBullseye } from "react-icons/fa";
+import { FaHome, FaBook, FaTasks, FaBullseye, FaBars } from "react-icons/fa";
 
 // Helper to format Firestore Timestamp or string
 function formatDate(ts) {
@@ -32,7 +32,7 @@ const Dashboard = () => {
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'dashboard');
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [geminiFeedback, setGeminiFeedback] = useState(null); // New state for Gemini feedback
-    // Sidebar is now always visible
+    const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
     const dropdownRef = useRef(null);
 
     // Handles user logout
@@ -87,6 +87,28 @@ const Dashboard = () => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+    
+    // Handle sidebar visibility based on screen size
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setSidebarOpen(false);
+            } else {
+                setSidebarOpen(true);
+            }
+        };
+        
+        // Set initial state
+        handleResize();
+        
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', handleResize);
         };
     }, []);
 
@@ -396,16 +418,22 @@ const Dashboard = () => {
     );
 
     return (
-        <div className="dashboard-container">
+        <div className={`dashboard-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
+            <button className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                <FaBars />
+            </button>
             <div className="layout-wrapper">
                 {/* Sidebar */}
-                <aside className="sidebar">
+                <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
                     <div className="logo">HexaBoard</div>
                     <nav className="nav-links">
                         <a
                             href="#"
                             className={activeTab === 'dashboard' ? 'active' : ''}
-                            onClick={() => setActiveTab('dashboard')}
+                            onClick={() => {
+                                setActiveTab('dashboard');
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaHome /></span>
                             Dashboard
@@ -413,7 +441,10 @@ const Dashboard = () => {
                         <a
                             href="#"
                             className={activeTab === 'courses' ? 'active' : ''}
-                            onClick={() => setActiveTab('courses')}
+                            onClick={() => {
+                                setActiveTab('courses');
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaBook /></span>
                             My Courses
@@ -421,7 +452,10 @@ const Dashboard = () => {
                         <a
                             href="#"
                             className={activeTab === 'assignments' ? 'active' : ''}
-                            onClick={() => setActiveTab('assignments')}
+                            onClick={() => {
+                                setActiveTab('assignments');
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaTasks /></span>
                             Assignments
@@ -429,6 +463,9 @@ const Dashboard = () => {
                         <a
                             href="/fresher/daily-quiz"
                             className="daily-quiz-link"
+                            onClick={() => {
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaBullseye /></span>
                             Daily Quiz
