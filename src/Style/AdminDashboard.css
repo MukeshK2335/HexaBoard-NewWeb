@@ -1,55 +1,91 @@
 /* Admin Container */
 .admin-container {
     display: flex;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     font-family: 'Segoe UI', sans-serif;
     background-color: #f4f7fb;
+    flex-direction: column; /* Default to column for mobile-first approach */
+    position: relative;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.admin-container.sidebar-closed {
+    /* Styles for when sidebar is closed */
+}
+
+/* Override body styles from index.css that might affect layout */
+body, html, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    display: block;
+    place-items: unset;
+}
+
+/* Layout Wrapper for desktop */
+.layout-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    position: relative;
+    overflow-x: hidden;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 220px;
+    width: 240px; /* Adjusted to match FresherDashboard */
     background: #0047BB;
     color: #fff;
-    padding: 2rem 1rem;
+    padding: 24px 16px; /* Adjusted to match FresherDashboard */
     display: flex;
     flex-direction: column;
     position: fixed;
     top: 0;
     left: 0;
-    bottom: 0;
-    z-index: 1000;
-    transition: width 0.3s ease-in-out;
     height: 100vh;
+    z-index: 1000;
+    transition: all 0.3s ease; /* Smooth transition for open/closed */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Added shadow */
+}
+
+.sidebar.closed {
+    transform: translateX(-100%); /* Hide sidebar off-screen */
 }
 
 .sidebar.open {
-    width: 220px;
+    transform: translateX(0); /* Show sidebar */
 }
 
 .sidebar-title {
-    font-size: 1.4rem;
-    font-weight: 600;
+    font-size: 24px; /* Adjusted to match FresherDashboard logo */
+    font-weight: bold;
     text-align: center;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding-bottom: 1rem;
+    margin-bottom: 30px; /* Adjusted to match FresherDashboard */
+    border-bottom: none; /* Removed border */
+    padding-bottom: 0; /* Removed padding */
 }
 
 .sidebar nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px; /* Adjusted to match FresherDashboard */
 }
 
 .sidebar nav li {
-    padding: 0.8rem 1rem;
-    margin: 0.4rem 0;
+    padding: 10px 14px; /* Adjusted to match FresherDashboard */
+    margin: 0; /* Removed margin */
     cursor: pointer;
     border-radius: 8px;
-    transition: background 0.2s ease;
+    transition: background 0.3s ease; /* Smooth transition */
     white-space: nowrap;
+    display: flex; /* For icon alignment */
+    align-items: center; /* For icon alignment */
+    gap: 10px; /* Space between icon and text */
 }
 
 .sidebar nav li.active,
@@ -57,30 +93,53 @@
     background: #0072CE;
 }
 
-/* Main Content */
-.main-content {
-    margin-left: 220px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 2rem 3rem;
-    overflow-y: auto;
-    height: 100vh;
-    box-sizing: border-box;
-    transition: margin-left 0.3s ease-in-out;
-    width: calc(100% - 220px);
+/* Hamburger Menu Button */
+.hamburger-menu {
+    display: none; /* Hidden by default on desktop */
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 9999; /* Very high z-index to ensure visibility */
+    background-color: #0047BB;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px; /* Increased padding for better touch target */
+    cursor: pointer;
+    font-size: 24px; /* Increased font size for better visibility */
+    width: 48px; /* Increased width for better visibility */
+    height: 48px; /* Increased height for better visibility */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Enhanced shadow for better visibility */
+    transition: all 0.3s ease;
 }
 
-.admin-container.sidebar-open .main-content {
-    margin-left: 220px;
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 24px 40px; /* Adjusted to match FresherDashboard */
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.3s ease;
+    margin-left: 240px; /* Match sidebar width */
+    width: calc(100% - 240px);
+    box-sizing: border-box;
+}
+
+.admin-container.sidebar-closed .main-content {
+    margin-left: 0;
+    width: 100%;
 }
 
 /* Top Bar */
 .top-bar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 24px; /* Adjusted to match FresherDashboard */
+    position: relative;
+    z-index: 900;
 }
 
 .admin-info {
@@ -113,6 +172,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     font-size: 1rem;
     font-weight: 600;
+    width: calc(25% - -131px);
     text-align: center;
     position: relative;
     color: #333;
@@ -226,56 +286,81 @@
     .admin-container {
         flex-direction: column;
         height: auto;
-        overflow-x: hidden; /* Prevent horizontal scroll */
+        overflow-x: hidden;
+    }
+
+    .layout-wrapper {
+        flex-direction: column;
     }
 
     .sidebar {
-        width: 220px;
-        transform: translateX(0); /* Show sidebar */
+        width: 240px; /* Adjusted to match FresherDashboard */
+        flex-direction: column;
+        padding: 20px 16px;
         position: fixed;
-        height: 100%;
         top: 0;
         left: 0;
-        padding-top: 60px; /* Space for hamburger */
-        box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for better visual */
+        height: 100vh;
+        z-index: 1010; /* Higher than hamburger to show above it when open */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transform: translateX(-100%); /* Hidden by default */
+        overflow-y: auto;
+    }
+
+    .sidebar.open {
+        transform: translateX(0); /* Show sidebar when open */
+    }
+
+    .hamburger-menu {
+        display: flex !important; /* Show hamburger menu on mobile with higher priority */
+        align-items: center;
+        justify-content: center;
     }
 
     .sidebar-title {
-        display: block; /* Show title in mobile sidebar */
+        display: block;
         text-align: left;
-        padding-left: 1rem;
+        padding-left: 0;
+        font-size: 20px; /* Adjusted for mobile */
+        margin-bottom: 24px; /* Adjusted for mobile */
     }
 
     .sidebar nav ul {
         flex-direction: column;
-        align-items: flex-start;
+        gap: 14px;
+        width: 100%;
+        padding-bottom: 20px;
     }
 
     .sidebar nav li {
         width: 100%;
-        margin: 0.2rem 0;
-        padding: 0.8rem 1rem;
-        font-size: 1rem;
+        margin: 0;
+        padding: 10px 14px;
+        font-size: 16px; /* Adjusted for mobile */
+        min-height: 44px; /* Improve touch target size */
+        display: flex;
+        align-items: center;
     }
 
     .main-content {
-        margin-left: 220px; /* Push content when sidebar is open */
-        padding: 1rem;
-        height: auto;
-        width: calc(100% - 220px);
-        position: relative; /* For hamburger positioning */
-        z-index: 1; /* Ensure content is above sidebar when closed */
+        margin-left: 0; /* No margin when sidebar is closed */
+        width: 100%;
+        box-sizing: border-box;
+        padding: 24px 20px; /* Adjusted to match FresherDashboard */
+        padding-top: 70px; /* Increased space for hamburger menu */
+        overflow-x: hidden;
     }
 
     .top-bar {
-        justify-content: space-between; /* Adjust for hamburger */
-        margin-bottom: 1rem;
-        padding: 0 1rem; /* Adjust padding */
-        align-items: center; /* Ensure vertical alignment */
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding-left: 50px; /* Make space for hamburger menu */
+        margin-bottom: 20px;
     }
 
     .admin-info {
-        margin-left: auto; /* Push to right */
+        margin-left: auto;
     }
 
     .dashboard-metrics {
@@ -307,8 +392,8 @@
     }
 
     .main-content {
-        margin-left: 180px;
-        width: calc(100% - 180px);
+        margin-left: 0; /* No margin when sidebar is closed */
+        width: 100%;
     }
 
     .sidebar nav li {
@@ -333,6 +418,7 @@
     }
 
     .top-bar {
-        padding: 0 0.8rem; /* Further reduce padding */
+        padding: 0 0.8rem;
     }
 }
+

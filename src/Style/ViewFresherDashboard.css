@@ -6,6 +6,18 @@
     font-family: 'Segoe UI', sans-serif;
     position: relative;
     transition: all 0.3s ease;
+    flex-direction: column; /* Default to column for mobile-first approach */
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Layout Wrapper for desktop */
+.layout-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    position: relative;
+    overflow-x: hidden;
 }
 
 /* Sidebar */
@@ -24,34 +36,33 @@
 }
 
 .sidebar.closed {
-    transform: translateX(-240px);
+    transform: translateX(-100%); /* Hide sidebar off-screen */
 }
 
-.toggle-sidebar {
+.sidebar.open {
+    transform: translateX(0); /* Show sidebar */
+}
+
+/* Hamburger Menu Button */
+.hamburger-menu {
+    display: none; /* Hidden by default, shown on mobile */
     position: fixed;
-    top: 20px;
-    left: 20px;
+    top: 15px;
+    left: 15px;
     z-index: 1001;
     background-color: #0047BB;
     color: white;
     border: none;
-    border-radius: 50%;
+    border-radius: 5px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 20px;
     width: 40px;
     height: 40px;
-    display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-}
-
-.sidebar-open .toggle-sidebar {
-    left: 260px;
-}
-
-.sidebar-closed .toggle-sidebar {
-    left: 20px;
 }
 
 .sidebar-header {

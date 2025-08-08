@@ -20,6 +20,7 @@ import {
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { FaBars } from "react-icons/fa"; // Import FaBars
 
 import adminpng from '../../assets/admin-logo.png';
 
@@ -35,15 +36,42 @@ const AdminDashboard = () => {
     const [courseProgressionData, setCourseProgressionData] = useState([]);
     const [freshersPerCourseData, setFreshersPerCourseData] = useState([]);
     const navigate = useNavigate();
+    const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
 
-    
+    // Handle sidebar visibility based on screen size
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setSidebarOpen(false);
+            } else {
+                setSidebarOpen(true);
+            }
+        };
+        
+        // Set initial state
+        handleResize();
+        
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    // Function to toggle sidebar visibility
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
 
     // Redirect if user is not authenticated or not admin
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 navigate('/');
-            } else {
+            }
+            else {
                 const token = await user.getIdTokenResult();
                 if (token.claims.role !== 'admin') {
                     navigate('/');
@@ -361,28 +389,34 @@ const handleAddFresher = async (fresher) => {
     };
 
     return (
-        <div className="admin-container sidebar-open">
-            <aside className="sidebar open">
-                <h2 className="sidebar-title">Admin Portal</h2>
-                <nav>
-                    <ul>
-                        <li className={selectedTab === 'dashboard' ? 'active' : ''} onClick={() => setSelectedTab('dashboard')}>Dashboard</li>
-                        <li className={selectedTab === 'fresher' ? 'active' : ''} onClick={() => setSelectedTab('fresher')}>Fresher Search</li>
-                        <li className={selectedTab === 'reports' ? 'active' : ''} onClick={() => setSelectedTab('reports')}>Reports</li>
-                        <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => setSelectedTab('courses')}>Course Management</li>
-                        <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => setSelectedTab('departments')}>Department Management</li>
-                        
-                        <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => setSelectedTab('settings')}>Settings</li>
-                    </ul>
-                </nav>
-            </aside>
+        <div className={`admin-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
+            <button className="hamburger-menu" onClick={toggleSidebar}>
+                <FaBars />
+            </button>
+            <div className="layout-wrapper">
+                <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+                    <h2 className="sidebar-title">Admin Portal</h2>
+                    <nav>
+                        <ul>
+                            <li className={selectedTab === 'dashboard' ? 'active' : ''} onClick={() => { setSelectedTab('dashboard'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Dashboard</li>
+                            <li className={selectedTab === 'fresher' ? 'active' : ''} onClick={() => { setSelectedTab('fresher'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Fresher Search</li>
+                            <li className={selectedTab === 'reports' ? 'active' : ''} onClick={() => { setSelectedTab('reports'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Reports</li>
+                            <li className={selectedTab === 'courses' ? 'active' : ''} onClick={() => { setSelectedTab('courses'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Course Management</li>
+                            <li className={selectedTab === 'departments' ? 'active' : ''} onClick={() => { setSelectedTab('departments'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Department Management</li>
+                            
+                            <li className={selectedTab === 'settings' ? 'active' : ''} onClick={() => { setSelectedTab('settings'); if (window.innerWidth <= 768) setSidebarOpen(false); }}>Settings</li>
+                        </ul>
+                    </nav>
+                </aside>
 
-            <main className="main-content">
-                
-                {renderSection()}
-            </main>
+                <main className="main-content">
+                    
+                    {renderSection()}
+                </main>
+            </div>
         </div>
     );
 };
 
 export default AdminDashboard;
+
