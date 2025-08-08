@@ -4,9 +4,6 @@ body {
     font-family: 'Segoe UI', sans-serif;
     background: #f9fafb;
     color: #111827;
-    overflow-x: hidden; /* Prevent horizontal scrolling at the body level */
-    width: 100%;
-    position: relative;
 }
 
 .dashboard-container {
@@ -14,9 +11,6 @@ body {
     min-height: 100vh;
     background: #f9fafb;
     flex-direction: column;
-    position: relative;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    width: 100%;
 }
 
 /* Layout Wrapper */
@@ -24,9 +18,9 @@ body {
     display: flex;
     flex-direction: row;
     width: 100%;
-    position: relative;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
+
+/* Removed sidebar-hidden styles as sidebar is now always visible */
 
 @media (max-width: 768px) {
     .layout-wrapper {
@@ -37,12 +31,12 @@ body {
 /* Sidebar / Navbar */
 .sidebar {
     width: 240px;
-    background-color: #4f46e5; /* Changed to a more modern color */
+    background-color: #d0d0e0;
     color: white;
     display: flex;
     flex-direction: column;
     padding: 24px 16px;
-    transition: all 0.3s ease;
+    transition: width 0.3s ease, padding 0.3s ease;
     height: 100vh;
     position: fixed;
     left: 0;
@@ -51,45 +45,13 @@ body {
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar.closed {
-    transform: translateX(-100%);
-}
-
-.hamburger-menu {
-    display: none;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1001;
-    background-color: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 0;
-    cursor: pointer;
-    font-size: 20px;
-    width: 40px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-}
-
 .main-content {
     flex: 1;
     padding: 24px 40px;
     overflow-y: auto;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    transition: all 0.3s ease;
+    transition: margin-left 0.3s ease, width 0.3s ease;
     margin-left: 240px; /* Match sidebar width */
     width: calc(100% - 240px);
-    box-sizing: border-box;
-}
-
-.sidebar-closed .main-content {
-    margin-left: 0;
-    width: 100%;
 }
 
 .logo {
@@ -171,15 +133,6 @@ body {
 }
 
 @media (max-width: 768px) {
-    body {
-        overflow-x: hidden; /* Prevent horizontal scrolling */
-    }
-    
-    .dashboard-container {
-        overflow-x: hidden;
-        width: 100%;
-    }
-    
     .sidebar {
         width: 240px;
         flex-direction: column;
@@ -188,27 +141,14 @@ body {
         top: 0;
         left: 0;
         height: 100vh;
-        z-index: 1010; /* Higher than hamburger to show above it when open */
+        z-index: 999;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        transform: translateX(-100%);
-        overflow-y: auto; /* Allow scrolling if menu is taller than screen */
-    }
-
-    .sidebar.open {
-        transform: translateX(0);
-    }
-
-    .hamburger-menu {
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .nav-links {
         flex-direction: column;
         gap: 14px;
         width: 100%;
-        padding-bottom: 20px; /* Add some bottom padding */
     }
 
     .nav-links a {
@@ -221,16 +161,10 @@ body {
     }
 
     .main-content {
-        margin-left: 0;
-        width: 100%;
+        margin-left: 240px;
+        width: calc(100% - 240px);
         box-sizing: border-box;
         padding: 24px 20px;
-        padding-top: 70px; /* Increased space for hamburger menu */
-        overflow-x: hidden; /* Prevent horizontal scrolling */
-    }
-
-    .topbar {
-        padding-left: 40px; /* Make space for hamburger menu */
     }
 
     .logo {
@@ -250,30 +184,7 @@ body {
         height: auto;
     }
     
-    /* Adjust cards layout for better tablet view - 2x2 grid */
-    .cards {
-        gap: 15px;
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-        min-height: auto; /* Allow height to adjust based on content */
-        margin-bottom: 20px; /* Ensure proper spacing before progress section */
-        overflow-x: visible; /* Reset overflow for tablet */
-    }
-    
-    .card {
-        min-width: calc(50% - 10px);
-        width: calc(50% - 10px);
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 15px;
-        min-height: 140px;
-        padding: 20px;
-        flex: 0 0 calc(50% - 10px); /* Prevent flex growth/shrink */
-    }
+    /* Removed sidebar-hidden styles for mobile as sidebar is now always visible */
 }
 
 /* Main Content */
@@ -289,8 +200,6 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
-    position: relative;
-    z-index: 900;
 }
 
 /* Sidebar toggle button - removed as sidebar is now always visible */
@@ -298,21 +207,9 @@ body {
 
 @media (max-width: 768px) {
     .topbar {
-        flex-direction: row;
-        align-items: center;
+        flex-direction: column;
+        align-items: flex-start;
         gap: 12px;
-        padding-left: 50px; /* Make space for hamburger menu */
-        margin-bottom: 20px;
-    }
-    
-    .topbar h2 {
-        font-size: 20px;
-        margin: 0;
-    }
-    
-    /* User dropdown is now fixed, no need for margin */
-    .user-dropdown {
-        /* margin-left: auto; - removed as dropdown is now fixed */
     }
 }
 
@@ -355,40 +252,21 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 14px;
-        padding: 24px;
-        margin-bottom: 24px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .welcome-card h3 {
-        font-size: 20px;
-    }
-    
-    .welcome-card p {
-        margin: 0 0 16px;
-        font-size: 14px;
     }
 }
 
 /* Cards */
 .cards {
     display: flex;
-    gap: 20px;
-    flex-wrap: nowrap;
-    margin-bottom: 30px; /* Reduced margin to prevent overflow */
-    width: 100%;
-    box-sizing: border-box;
-    justify-content: space-between; /* Distribute cards evenly */
-    min-height: 150px; /* Ensure minimum height for cards container */
-    overflow-x: auto; /* Allow horizontal scrolling if needed */
-    padding-bottom: 5px; /* Add padding for scrollbar */
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
 }
 
 .card {
     background: linear-gradient(145deg, #ffffff, #f1f5f9);
     border-radius: 16px;
-    padding: 20px;
+    padding: 28px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
@@ -398,11 +276,8 @@ body {
     transition: all 0.3s ease;
     overflow: hidden;
     border-left: 5px solid #6366f1;
-    width: calc(25% - 15px); /* Set width to 1/4 of container minus gap */
-    box-sizing: border-box;
-    margin-bottom: 10px; /* Reduced margin to prevent overflow */
-    min-height: 150px; /* Ensure minimum height */
-    flex-shrink: 0; /* Prevent cards from shrinking */
+    min-width: 220px;
+    flex: 1;
 }
 
 .card:hover {
@@ -419,7 +294,7 @@ body {
 }
 
 .card .count {
-    font-size: 32px;
+    font-size: 38px;
     font-weight: bold;
     color: #111827;
     margin-bottom: 6px;
@@ -463,10 +338,6 @@ body {
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     margin-bottom: 32px;
-    margin-top: 30px; /* Increased margin-top to create more space between cards and progress */
-    clear: both; /* Ensure it starts on a new line */
-    position: relative; /* Ensure proper stacking context */
-    z-index: 1; /* Ensure it's above any overflowing elements */
 }
 
 .progress-header {
@@ -517,11 +388,8 @@ body {
 
 /* User Dropdown */
 .user-dropdown {
-    position: fixed;
+    position: relative;
     display: inline-block;
-    top: 20px;
-    right: 40px;
-    z-index: 1050;
 }
 
 .user-name {
@@ -549,7 +417,7 @@ body {
     flex-direction: column;
     min-width: 160px;
     padding: 8px 0;
-    z-index: 1100; /* Ensure dropdown appears above other elements */
+    z-index: 1000;
 }
 
 .dropdown-menu.open {
@@ -570,21 +438,17 @@ body {
 
 @media (max-width: 768px) {
     .user-dropdown {
-        position: fixed;
-        top: 15px;
-        right: 15px;
-        width: auto;
-        z-index: 1050;
+        width: 100%;
     }
 
     .dropdown-menu {
-        right: 0;
-        left: auto;
-        width: 180px;
+        right: auto;
+        left: 0;
+        width: 100%;
     }
 
     .user-name {
-        width: auto;
+        width: 100%;
     }
 }
 
@@ -1263,14 +1127,8 @@ body {
 }
 
 @media (max-width: 480px) {
-    /* Styles for small mobile screens */
     .main-content {
         padding: 15px;
-    }
-    
-    .user-dropdown {
-        top: 10px;
-        right: 10px;
     }
 
     .topbar {
@@ -1293,26 +1151,13 @@ body {
     }
 
     .cards {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 10px;
-        display: flex; /* Ensure display is set */
-        width: 100%;
-        min-height: auto; /* Allow height to adjust based on content */
-        justify-content: space-between;
-        margin-bottom: 20px; /* Ensure proper spacing before progress section */
-        overflow-x: visible; /* Reset overflow for mobile */
+        flex-direction: column;
+        gap: 15px;
     }
 
     .card {
         min-width: unset;
-        width: calc(50% - 5px); /* Two cards per row */
-        display: flex; /* Ensure cards are displayed */
-        margin-bottom: 10px;
-        box-sizing: border-box;
-        min-height: 120px; /* Ensure minimum height */
-        padding: 15px;
-        flex: 0 0 calc(50% - 5px); /* Prevent flex growth/shrink */
+        width: 100%;
     }
     
     .course-content {
@@ -1686,20 +1531,6 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-/* Extra small screens */
-@media (max-width: 360px) {
-    .cards {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .card {
-        width: 100%;
-        margin-bottom: 10px;
-        padding: 15px;
-    }
 }
 
 @keyframes slideIn {
