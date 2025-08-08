@@ -228,7 +228,7 @@ export const courseService = {
             const departmentsRef = collection(db, 'departments');
             await addDoc(departmentsRef, {
                 ...departmentData,
-                memberCount: 0,
+                memberCount: 0, // Initialize to 0, but UI will use actual count of freshers
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
@@ -259,6 +259,8 @@ export const courseService = {
             });
             
             // Update department member count
+            // Note: We're still updating memberCount in the database for backward compatibility,
+            // but the UI will use the actual count of freshers in each department
             batch.update(departmentRef, { 
                 memberCount: (departmentDoc.data().memberCount || 0) + 1,
                 updatedAt: new Date()
@@ -292,6 +294,8 @@ export const courseService = {
             });
             
             // Update department member count (ensure it doesn't go below 0)
+            // Note: We're still updating memberCount in the database for backward compatibility,
+            // but the UI will use the actual count of freshers in each department
             const currentCount = departmentDoc.data().memberCount || 0;
             batch.update(departmentRef, { 
                 memberCount: Math.max(0, currentCount - 1),

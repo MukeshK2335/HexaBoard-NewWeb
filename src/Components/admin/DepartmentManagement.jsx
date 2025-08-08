@@ -145,6 +145,8 @@ const DepartmentManagement = () => {
             }
 
             // Apply department member count updates
+            // Note: We're still updating memberCount in the database for backward compatibility,
+            // but the UI will use the actual count of freshers in each department
             for (const deptId in departmentUpdates) {
                 const deptRef = doc(db, "departments", deptId);
                 batch.update(deptRef, {
@@ -208,7 +210,7 @@ const DepartmentManagement = () => {
                                     <div className="department-header">
                                         <h3>{department.name}</h3>
                                         <div className="department-stats">
-                                            <span>{department.memberCount || 0} members</span>
+                                            <span>{departmentFreshers.length} members</span>
                                         </div>
                                     </div>
                                     <div className="department-details">
