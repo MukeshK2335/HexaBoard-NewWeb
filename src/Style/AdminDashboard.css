@@ -33,6 +33,22 @@ body, html, #root {
     overflow-x: hidden;
 }
 
+/* Hamburger Menu */
+.hamburger-menu {
+    display: none; /* Hidden by default, shown on mobile */
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: #0047BB;
+    color: #fff;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 1001; /* Above sidebar */
+}
+
 /* Sidebar */
 .sidebar {
     width: 240px; /* Adjusted to match FresherDashboard */
@@ -44,9 +60,10 @@ body, html, #root {
     position: fixed;
     top: 0;
     left: 0;
+    bottom: 0;
     height: 100vh;
     z-index: 1000;
-    transition: all 0.3s ease; /* Smooth transition for open/closed */
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out, all 0.3s ease; /* Combined transitions */
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Added shadow */
 }
 
@@ -126,6 +143,7 @@ body, html, #root {
     width: calc(100% - 240px);
     box-sizing: border-box;
 }
+
 
 .admin-container.sidebar-closed .main-content {
     margin-left: 0;
@@ -283,6 +301,10 @@ body, html, #root {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .hamburger-menu {
+        display: block;
+    }
+
     .admin-container {
         flex-direction: column;
         height: auto;
@@ -297,6 +319,7 @@ body, html, #root {
         width: 240px; /* Adjusted to match FresherDashboard */
         flex-direction: column;
         padding: 20px 16px;
+        transform: translateX(-100%); /* Hide sidebar by default on mobile */
         position: fixed;
         top: 0;
         left: 0;
@@ -315,6 +338,10 @@ body, html, #root {
         display: flex !important; /* Show hamburger menu on mobile with higher priority */
         align-items: center;
         justify-content: center;
+    }
+
+    .sidebar.open {
+        transform: translateX(0); /* Show sidebar when open */
     }
 
     .sidebar-title {
@@ -346,9 +373,12 @@ body, html, #root {
         margin-left: 0; /* No margin when sidebar is closed */
         width: 100%;
         box-sizing: border-box;
-        padding: 24px 20px; /* Adjusted to match FresherDashboard */
+        padding: 1rem;
         padding-top: 70px; /* Increased space for hamburger menu */
         overflow-x: hidden;
+        height: auto;
+        position: relative; /* For hamburger positioning */
+        z-index: 1; /* Ensure content is above sidebar when closed */
     }
 
     .top-bar {

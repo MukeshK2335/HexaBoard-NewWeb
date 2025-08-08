@@ -422,6 +422,13 @@
 
 /* Responsive layout */
 @media (max-width: 768px) {
+    .hamburger-menu {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+    }
+    
     .dashboard-container {
         flex-direction: column;
     }

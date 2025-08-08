@@ -27,6 +27,7 @@ import adminpng from '../../assets/admin-logo.png';
 const AdminDashboard = () => {
     const [selectedTab, setSelectedTab] = useState('dashboard');
     const [loginLogs, setLoginLogs] = useState([]);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
     
     const [freshersCount, setFreshersCount] = useState(0);
     const [coursesCount, setCoursesCount] = useState(0);
@@ -36,7 +37,6 @@ const AdminDashboard = () => {
     const [courseProgressionData, setCourseProgressionData] = useState([]);
     const [freshersPerCourseData, setFreshersPerCourseData] = useState([]);
     const navigate = useNavigate();
-    const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
 
     // Handle sidebar visibility based on screen size
     useEffect(() => {
@@ -185,6 +185,28 @@ const AdminDashboard = () => {
             { name: 'Firebase Fundamentals', "Number of Freshers": 20 },
         ];
         setFreshersPerCourseData(sampleFreshersPerCourseData);
+    }, []);
+
+    // Handle sidebar visibility based on screen size
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setSidebarOpen(false);
+            } else {
+                setSidebarOpen(true);
+            }
+        };
+        
+        // Set initial state
+        handleResize();
+        
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
 

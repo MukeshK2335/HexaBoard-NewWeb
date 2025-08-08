@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../../Style/ViewFresherDashboard.css';
 import { Home, User, FileText, BookOpen, CheckSquare, Menu } from 'lucide-react';
+import { FaBars } from "react-icons/fa";
 import { db } from '../../firebase';
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import FresherProfile from '../fresher/FresherProfile.jsx';
@@ -114,7 +115,7 @@ const ViewFresherDashboard = () => {
     return (
         <div className={`dashboard-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
             <button className="hamburger-menu" onClick={toggleSidebar}>
-                <Menu size={24} />
+                <FaBars />
             </button>
             <div className="layout-wrapper">
                 {/* Sidebar */}
