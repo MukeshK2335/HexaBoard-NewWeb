@@ -11,6 +11,7 @@ const CourseDetailView = () => {
     const [loading, setLoading] = useState(true);
     const [currentVideo, setCurrentVideo] = useState(null);
     const [currentLesson, setCurrentLesson] = useState(null);
+    const [isModulesHidden, setIsModulesHidden] = useState(false);
 
     useEffect(() => {
         const fetchCourseDetails = async () => {
@@ -89,8 +90,12 @@ const CourseDetailView = () => {
                         </div>
                     )}
                 </div>
-
-                <div className="course-modules-list">
+                
+                <button className="toggle-modules-btn" onClick={() => setIsModulesHidden(!isModulesHidden)}>
+                    {isModulesHidden ? 'Show Modules' : 'Hide Modules'}
+                </button>
+                
+                <div className={`course-modules-list ${isModulesHidden ? 'hidden' : ''}`}>
                     <h2>Course Modules</h2>
                     {course.modules && course.modules.length > 0 ? (
                         course.modules.map((module, moduleIndex) => (

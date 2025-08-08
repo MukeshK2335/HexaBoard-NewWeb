@@ -122,8 +122,8 @@ const FresherCoursePlayer = () => {
 
                     setTimeout(() => {
                         setNotification({ show: false, message: '' });
-                        navigate('/fresher/dashboard', { state: { activeTab: 'assignments' } });
-                    }, 3000);
+                        navigate('/fresher/', { state: { activeTab: 'assignments' } });
+                    }, 1000);
 
                 }, 3000);
 
@@ -203,6 +203,15 @@ const FresherCoursePlayer = () => {
                             </div>
                         ))}
                     </div>
+                </div>
+            )}
+            
+            {/* Mobile-only footer for finish button */}
+            {currentLectureIndex === course.lectures.length - 1 && (
+                <div className="mobile-footer">
+                    <button className="mobile-finish-course-btn" onClick={handleFinishCourse}>
+                        Finish Course
+                    </button>
                 </div>
             )}
         </div>

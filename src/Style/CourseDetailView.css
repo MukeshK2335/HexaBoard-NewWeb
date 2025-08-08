@@ -179,10 +179,51 @@
     color: #777;
 }
 
+.toggle-modules-btn {
+    display: none; /* Hidden by default on desktop */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-modules-btn:hover {
+    background-color: #0056b3;
+}
+
+.course-modules-list.hidden {
+    display: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .course-detail-view {
+        padding: 15px 10px;
+    }
+    
+    .course-detail-header {
+        padding: 15px;
+    }
+    
+    .course-detail-header h1 {
+        font-size: 2em;
+    }
+    
+    .course-detail-header p {
+        font-size: 1em;
+    }
+    
     .course-content-area {
         flex-direction: column;
+        gap: 15px;
     }
 
     .video-player-section, .course-modules-list {
@@ -192,5 +233,67 @@
 
     .main-video-player, .no-video-placeholder {
         min-height: 250px;
+    }
+    
+    .toggle-modules-btn {
+        display: block; /* Show on mobile */
+    }
+    
+    .current-lesson-info h3 {
+        font-size: 1.3em;
+    }
+    
+    .current-lesson-info p {
+        font-size: 0.9em;
+    }
+    
+    .course-modules-list h2 {
+        font-size: 1.5em;
+    }
+    
+    .module-item h3 {
+        font-size: 1.2em;
+    }
+    
+    .module-item p {
+        font-size: 0.9em;
+    }
+    
+    .module-item button {
+        padding: 6px 10px;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 480px) {
+    .course-detail-view {
+        padding: 10px 5px;
+    }
+    
+    .course-detail-header {
+        padding: 12px;
+    }
+    
+    .course-detail-header h1 {
+        font-size: 1.8em;
+    }
+    
+    .main-video-player, .no-video-placeholder {
+        min-height: 200px;
+    }
+    
+    .module-item button, .lesson-item button {
+        padding: 5px 8px;
+        font-size: 0.8em;
+    }
+    
+    .lesson-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .lesson-item button {
+        margin-top: 5px;
+        align-self: flex-end;
     }
 }
