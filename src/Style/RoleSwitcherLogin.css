@@ -7,7 +7,8 @@
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevent scrollbars */
+    overflow-x: hidden; /* Prevent horizontal scrollbars */
+    overflow-y: auto; /* Allow vertical scrolling if needed */
 }
 
 .login-page-container {
@@ -17,7 +18,8 @@ body {
     justify-content: center;
     min-height: 100vh;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Softer, modern gradient */
-    padding: 20px;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
 .login-logo {
@@ -165,46 +167,83 @@ body {
 
 @media (max-width: 480px) {
     .login-logo {
-        width: 150px;
-        margin-bottom: 25px;
+        width: 70px;
+        margin-bottom: 15px;
+    }
+    
+    .login-logo-small {
+        width: 55px;
+        margin-bottom: 12px;
     }
 
     .login-container {
-        padding: 30px 20px;
-        max-width: 98%;
+        padding: 25px 20px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
     }
 
     .login-heading {
         font-size: 24px;
-        margin-bottom: 25px;
+        margin-bottom: 22px;
+        letter-spacing: 1px;
     }
 
     .tabs {
-        flex-direction: column;
+        flex-direction: row;
         gap: 10px;
-        margin-bottom: 25px;
+        margin-bottom: 22px;
+        width: 100%;
     }
 
     .tabs button {
-        padding: 10px 0;
+        padding: 12px 0;
         font-size: 15px;
+        flex: 1;
     }
 
     .form {
         gap: 18px;
+        width: 100%;
     }
 
     .form input {
-        padding: 12px 18px;
-        font-size: 14px;
+        padding: 14px 16px;
+        font-size: 15px;
+        width: 100%;
     }
 
     .form button {
-        padding: 12px;
-        font-size: 15px;
+        padding: 14px;
+        font-size: 16px;
+        width: 100%;
     }
 
     .error {
         font-size: 13px;
+        margin-top: -8px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* Fix for very small screens */
+    @media (max-width: 320px) {
+        .login-container {
+            padding: 20px 15px;
+        }
+        
+        .tabs {
+            gap: 8px;
+        }
+        
+        .login-heading {
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+        
+        .form input,
+        .form button {
+            padding: 12px;
+        }
     }
 }

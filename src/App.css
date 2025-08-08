@@ -12,7 +12,7 @@ body, html, #root {
   height: 100vh;
   background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
   padding: 0;
-  overflow: hidden;
+  overflow: auto; /* Changed from hidden to auto to allow scrolling if needed */
 }
 
 .inner-wrapper {
@@ -20,4 +20,23 @@ body, html, #root {
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  margin: 15px;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 480px) {
+  .outer-box {
+    padding: 10px;
+    align-items: center;
+  }
+  
+  .inner-wrapper {
+    padding: 15px 10px;
+    margin: 0;
+    width: 95%;
+    max-width: 400px;
+    border-radius: 12px;
+  }
 }
