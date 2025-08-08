@@ -418,16 +418,22 @@ const Dashboard = () => {
     );
 
     return (
-        <div className="dashboard-container">
+        <div className={`dashboard-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
+            <button className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                <FaBars />
+            </button>
             <div className="layout-wrapper">
                 {/* Sidebar */}
-                <aside className="sidebar">
+                <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
                     <div className="logo">HexaBoard</div>
                     <nav className="nav-links">
                         <a
                             href="#"
                             className={activeTab === 'dashboard' ? 'active' : ''}
-                            onClick={() => setActiveTab('dashboard')}
+                            onClick={() => {
+                                setActiveTab('dashboard');
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaHome /></span>
                             Dashboard
@@ -435,7 +441,10 @@ const Dashboard = () => {
                         <a
                             href="#"
                             className={activeTab === 'courses' ? 'active' : ''}
-                            onClick={() => setActiveTab('courses')}
+                            onClick={() => {
+                                setActiveTab('courses');
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaBook /></span>
                             My Courses
@@ -443,7 +452,10 @@ const Dashboard = () => {
                         <a
                             href="#"
                             className={activeTab === 'assignments' ? 'active' : ''}
-                            onClick={() => setActiveTab('assignments')}
+                            onClick={() => {
+                                setActiveTab('assignments');
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaTasks /></span>
                             Assignments
@@ -451,6 +463,9 @@ const Dashboard = () => {
                         <a
                             href="/fresher/daily-quiz"
                             className="daily-quiz-link"
+                            onClick={() => {
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
                         >
                             <span className="nav-icon"><FaBullseye /></span>
                             Daily Quiz
