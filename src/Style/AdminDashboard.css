@@ -178,35 +178,144 @@ body, html, #root {
 
 /* Dashboard Cards */
 .dashboard-metrics {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 2rem;
 }
 
 .card {
     padding: 1.8rem;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     font-size: 1rem;
     font-weight: 600;
-    width: calc(25% - -131px);
-    text-align: center;
+    width: calc(25% - 15px);
+    text-align: left;
     position: relative;
     color: #333;
+    transition: all 0.3s ease;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    animation: cardFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card .info {
+    display: none;
+    font-size: 13px;
+    color: #10b981;
+    margin-top: 5px;
 }
 
 .card span {
     display: block;
-    font-size: 2rem;
-    margin-top: 0.8rem;
-    color: #0047BB;
+    font-size: 3rem;
+    margin-top: 0.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
-.card.blue { border-left: 5px solid #0047BB; }
-.card.green { border-left: 5px solid #2ECC71; }
-.card.orange { border-left: 5px solid #FF9800; }
-.card.teal { border-left: 5px solid #00BCD4; }
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.card h4 {
+    font-size: 15px;
+    color: #6b7280;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.card.blue { 
+    border-left: 6px solid #0047BB; 
+}
+
+.card.green { 
+    border-left: 6px solid #2ECC71; 
+}
+
+.card.orange { 
+    border-left: 6px solid #FF9800; 
+}
+
+.card.teal { 
+    border-left: 6px solid #00BCD4; 
+}
+
+.card.blue span { color: #0047BB; }
+.card.green span { color: #2ECC71; }
+.card.orange span { color: #FF9800; }
+.card.teal span { color: #00BCD4; }
+
+.card button {
+    display: none;
+    background-color: #0047BB;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 71, 187, 0.2);
+}
+
+.card button:hover {
+    background-color: #003a9e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 71, 187, 0.3);
+}
+
+.card.green button {
+    background-color: #2ECC71;
+    box-shadow: 0 2px 5px rgba(46, 204, 113, 0.2);
+}
+
+.card.green button:hover {
+    background-color: #27ae60;
+    box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+}
+
+.card.orange button {
+    background-color: #FF9800;
+    box-shadow: 0 2px 5px rgba(255, 152, 0, 0.2);
+}
+
+.card.orange button:hover {
+    background-color: #f57c00;
+    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+}
+
+.card.teal button {
+    background-color: #00BCD4;
+    box-shadow: 0 2px 5px rgba(0, 188, 212, 0.2);
+}
+
+.card.teal button:hover {
+    background-color: #00acc1;
+    box-shadow: 0 4px 8px rgba(0, 188, 212, 0.3);
+}
 
 /* Admin Settings */
 .admin-settings {
@@ -394,7 +503,13 @@ body, html, #root {
     }
 
     .dashboard-metrics {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .card {
+        width: 100%;
+        margin-bottom: 1rem;
     }
 
     .admin-settings {
@@ -416,6 +531,22 @@ body, html, #root {
     }
 }
 
+@media (min-width: 769px) and (max-width: 1024px) {
+    .dashboard-metrics {
+        flex-wrap: wrap;
+        gap: 1.2rem;
+    }
+    
+    .card {
+        width: calc(50% - 0.6rem);
+        min-height: 160px;
+    }
+    
+    .card span {
+        font-size: 2.2rem;
+    }
+}
+
 @media (max-width: 480px) {
     .sidebar {
         width: 180px;
@@ -432,11 +563,18 @@ body, html, #root {
     }
 
     .card {
-        padding: 1.2rem;
+        padding: 1.5rem;
+        width: 100%;
+        min-height: 140px;
+        margin-bottom: 1rem;
     }
 
     .card span {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+    }
+    
+    .card h4 {
+        font-size: 15px;
     }
 
     .settings-card h3 {
