@@ -3,7 +3,7 @@ import { MessageCircle, Send, X, Bot, User, Loader2 } from 'lucide-react';
 import { db, auth } from '../../firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { chatbotService } from '../../services/chatbotService';
+import { generateContextualResponse } from '../../services/chatbotService';
 import '../../Style/Chatbot.css';
 
 const Chatbot = () => {
@@ -105,7 +105,7 @@ const Chatbot = () => {
         
         try {
             // Use the chatbot service for contextual responses
-            const contextualResponse = await chatbotService.generateContextualResponse(user.uid, userMessage);
+            const contextualResponse = await generateContextualResponse(user.uid, userMessage);
             return contextualResponse;
         } catch (error) {
             console.error('Error generating contextual response:', error);

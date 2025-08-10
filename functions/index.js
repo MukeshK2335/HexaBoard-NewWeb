@@ -105,6 +105,8 @@ exports.uploadFreshers = functions.https.onRequest((req, res) => {
                                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
                             });
 
+                            await admin.firestore().collection("users").doc(userRecord.uid).collection("coding_challenge").add({});
+
                             // Increment department member count
                             await admin.firestore().collection("departments").doc(department.id).update({
                                 memberCount: admin.firestore.FieldValue.increment(1),
@@ -174,6 +176,8 @@ exports.addFresher = functions.https.onRequest(async (req, res) => {
                 role: "fresher",
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
             });
+
+            await admin.firestore().collection("users").doc(userRecord.uid).collection("coding_challenge").add({});
 
             // Increment department member count
             await admin.firestore().collection("departments").doc(department.id).update({
@@ -274,7 +278,7 @@ exports.deleteFresher = functions.https.onCall(async (data, context) => {
     } catch (error) {
         console.error(`Error deleting user ${email} (UID: ${uid}):`, error);
         // Check if the error is due to user not found in Auth
-        if (error.code === 'auth/user-not-found') {
+        if (error.code === 'auth/user-not-.found') {
             // If user not found in Auth, still try to delete from Firestore
             try {
                 await admin.firestore().collection('users').doc(uid).delete();

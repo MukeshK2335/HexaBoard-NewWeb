@@ -8,7 +8,8 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoadingScreen from "../LoadingScreen.jsx";
 import MyCourses from "./MyCourses.jsx";
 import Chatbot from "./Chatbot.jsx";
-import { FaHome, FaBook, FaTasks, FaBullseye, FaBars } from "react-icons/fa";
+import CodeChallenge from "./CodeChallenge.jsx";
+import { FaHome, FaBook, FaTasks, FaBullseye, FaBars, FaCode } from "react-icons/fa";
 
 // Helper to format Firestore Timestamp or string
 function formatDate(ts) {
@@ -417,6 +418,10 @@ const Dashboard = () => {
         <MyCourses />
     );
 
+    const renderCodingChallenge = () => (
+        <CodeChallenge />
+    );
+
     return (
         <div className={`dashboard-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
             <button className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
@@ -470,13 +475,24 @@ const Dashboard = () => {
                             <span className="nav-icon"><FaBullseye /></span>
                             Daily Quiz
                         </a>
+                        <a
+                            href="#"
+                            className={activeTab === 'coding-challenge' ? 'active' : ''}
+                            onClick={() => {
+                                setActiveTab('coding-challenge');
+                                if (window.innerWidth <= 768) setSidebarOpen(false);
+                            }}
+                        >
+                            <span className="nav-icon"><FaCode /></span>
+                            Coding Challenge
+                        </a>
                     </nav>
                 </aside>
 
                 {/* Main */}
                 <main className="main-content">
                     <header className="topbar">
-                        <h2>{activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'courses' ? 'My Learning' : activeTab === 'assignments' ? 'Assignments' : 'Dashboard'}</h2>
+                        <h2>{activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'courses' ? 'My Learning' : activeTab === 'assignments' ? 'Assignments' : activeTab === 'coding-challenge' ? 'Coding Challenge' : 'Dashboard'}</h2>
                         <div className="user-dropdown" ref={dropdownRef}>
                             <span className="user-name" onClick={() => setDropdownOpen(!dropdownOpen)}>
                                 {userName} ▾
@@ -490,7 +506,7 @@ const Dashboard = () => {
                     </header>
 
                     {/* Main content rendering based on active tab */}
-                    {activeTab === 'dashboard' ? renderDashboard() : activeTab === 'courses' ? renderCourses() : renderAssignments()}
+                    {activeTab === 'dashboard' ? renderDashboard() : activeTab === 'courses' ? renderCourses() : activeTab === 'assignments' ? renderAssignments() : renderCodingChallenge()}
                 </main>
             </div>
 

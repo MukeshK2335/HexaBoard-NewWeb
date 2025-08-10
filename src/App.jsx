@@ -11,6 +11,7 @@ import FresherCoursePlayer from './Components/fresher/FresherCoursePlayer.jsx';
 import MyCourses from './Components/fresher/MyCourses.jsx';
 import AssessmentPage from './Components/assessments/AssessmentPage.jsx';
 import DailyQuiz from './Components/fresher/DailyQuiz.jsx';
+import CodeChallenge from './Components/fresher/CodeChallenge.jsx';
 import './App.css';
 
 function App() {
@@ -90,6 +91,13 @@ function App() {
                 <Route path="/fresher/daily-quiz" element={
                     <ProtectedRoute>
                         <DailyQuiz />
+                    </ProtectedRoute>
+                } />
+
+                {/* Coding Challenge Route */}
+                <Route path="/fresher/code-challenge" element={
+                    <ProtectedRoute>
+                        <CodeChallenge />
                     </ProtectedRoute>
                 } />
             </Routes>
