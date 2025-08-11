@@ -143,6 +143,20 @@ body {
     color: #78350f;
 }
 
+.nav-links a.daily-problem-link {
+    background-color: #dcfce7;
+    color: #166534;
+    font-weight: 600;
+    margin-top: 10px;
+    border: 2px solid #bbf7d0;
+    transition: all 0.3s ease;
+}
+
+.nav-links a.daily-problem-link:hover {
+    background-color: #5a57ff;
+    color: white;
+}
+
 /* Media query for screens less than 773px × 1108px */
 @media (max-width: 1108px) {
     /* Topbar styles */
@@ -456,6 +470,33 @@ body {
     font-weight: 500;
 }
 
+/* Daily Problem Card */
+.daily-problem-card {
+    background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+    border: 2px solid #bbf7d0;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.daily-problem-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.daily-problem-card h4 {
+    color: #166534;
+}
+
+.daily-problem-card .problem-icon {
+    font-size: 32px;
+    margin: 5px 0;
+}
+
+.daily-problem-card .info {
+    color: #166534;
+    font-weight: 500;
+}
+
 /* Progress */
 .progress {
     background: white;
@@ -513,6 +554,42 @@ body {
 
 .cert-list li:last-child {
     border-bottom: none;
+}
+
+/* Coding Challenge Heatmap */
+.coding-challenge-heatmap {
+    background: white;
+    margin-top: 32px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* Calendar Heatmap Custom Styles */
+.react-calendar-heatmap .color-empty { 
+    fill: #ebedf0; 
+}
+
+.react-calendar-heatmap .color-scale-1 { 
+    fill: #c6e48b; 
+}
+
+.react-calendar-heatmap .color-scale-2 { 
+    fill: #7bc96f; 
+}
+
+.react-calendar-heatmap .color-scale-3 { 
+    fill: #239a3b; 
+}
+
+.react-calendar-heatmap .color-scale-4 { 
+    fill: #196127; 
+}
+
+/* Make sure the heatmap is responsive */
+.react-calendar-heatmap {
+    width: 100%;
+    height: auto;
 }
 
 /* User Dropdown */

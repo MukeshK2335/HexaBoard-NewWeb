@@ -9,7 +9,13 @@ import LoadingScreen from "../LoadingScreen.jsx";
 import MyCourses from "./MyCourses.jsx";
 import Chatbot from "./Chatbot.jsx";
 import CodeChallenge from "./CodeChallenge.jsx";
-import { FaHome, FaBook, FaTasks, FaBullseye, FaBars, FaCode } from "react-icons/fa";
+import DailyProblem from "./DailyProblem.jsx";
+import { FaHome, FaBook, FaTasks, FaBullseye, FaBars, FaCode, FaPuzzlePiece } from "react-icons/fa";
+import CalendarHeatmap from 'react-calendar-heatmap';
+import 'react-calendar-heatmap/dist/styles.css';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
+
 
 // Helper to format Firestore Timestamp or string
 function formatDate(ts) {
@@ -34,6 +40,9 @@ const Dashboard = () => {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [geminiFeedback, setGeminiFeedback] = useState(null); // New state for Gemini feedback
     const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
+    const [codingChallengeData, setCodingChallengeData] = useState([]); // State for coding challenge submissions
+    const [dailyProblemData, setDailyProblemData] = useState([]); // State for daily problem submissions
+    const [problemStreak, setProblemStreak] = useState(0); // State for daily problem streak
     const dropdownRef = useRef(null);
 
     // Handles user logout
@@ -127,6 +136,36 @@ const Dashboard = () => {
             setError(null);
 
             if (user) {
+                // Fetch coding challenge submissions and daily problem data
+                try {
+                     const challengesRef = collection(db, "users", user.uid, "codingChallenges");
+                     const challengesSnap = await getDocs(challengesRef);
+                     const challengeData = challengesSnap.docs.map(doc => ({
+                         id: doc.id,
+                         ...doc.data(),
+                         date: doc.data().timestamp?.toDate().toISOString().split('T')[0] || new Date().toISOString().split('T')[0]
+                     }));
+                     setCodingChallengeData(challengeData);
+                     
+                     // Fetch daily problem data
+                     const problemsRef = collection(db, "users", user.uid, "dailyProblems");
+                     const problemsSnap = await getDocs(problemsRef);
+                     const problemData = problemsSnap.docs.map(doc => ({
+                         id: doc.id,
+                         ...doc.data(),
+                         date: doc.data().timestamp?.toDate().toISOString().split('T')[0] || doc.data().date || new Date().toISOString().split('T')[0]
+                     }));
+                     setDailyProblemData(problemData);
+                     
+                     // Get user streak data
+                     const userDoc = await getDoc(userRef);
+                     if (userDoc.exists()) {
+                         const userData = userDoc.data();
+                         setProblemStreak(userData.problemStreak || 0);
+                     }
+                 } catch (err) {
+                     console.error("Error fetching coding challenges or daily problems:", err);
+                 }
                 try {
                     // Update login time when user logs in
                     const userRef = doc(db, "users", user.uid);
@@ -279,9 +318,63 @@ const Dashboard = () => {
                     <p className="quiz-icon">🎯</p>
                     <span className="info">Test your knowledge daily!</span>
                 </div>
+                <div className="card daily-problem-card" onClick={() => setActiveTab('daily-problem')}>
+                    <h4>Daily Problem</h4>
+                    <p className="problem-icon">💻</p>
+                    <span className="info">Streak: {problemStreak} days</span>
+                </div>
             </section>
 
-            {/* Assignment Marks Chart */}
+          
+            {/* Coding Challenge Heatmap */}
+             <section className="coding-challenge-heatmap">
+                 <h4>🧩 Coding Challenge Activity</h4>
+                 <div style={{ marginTop: '10px', marginBottom: '20px' }}>
+                     <CalendarHeatmap
+                         startDate={new Date(new Date().getFullYear(), 0, 1)}
+                         endDate={new Date()}
+                         values={codingChallengeData.map(challenge => ({
+                             date: challenge.date,
+                             count: 1,
+                             title: challenge.question || 'Coding Challenge'
+                         }))}
+                         classForValue={(value) => {
+                             if (!value) {
+                                 return 'color-empty';
+                             }
+                             return `color-scale-${Math.min(value.count, 4)}`;
+                         }}
+                         tooltipDataAttrs={(value) => {
+                              if (!value || !value.date) {
+                                  return null;
+                              }
+                              return {
+                                  'data-tooltip-id': 'calendar-tooltip',
+                                  'data-tooltip-content': `${value.date}: ${value.title}`,
+                              };
+                          }}
+                     />
+                     <ReactTooltip id="calendar-tooltip" />
+                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                         <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', color: '#666' }}>
+                             <span>Less</span>
+                             <div style={{ display: 'flex', margin: '0 8px' }}>
+                                 <div style={{ width: '10px', height: '10px', margin: '0 2px', backgroundColor: '#ebedf0' }}></div>
+                                 <div style={{ width: '10px', height: '10px', margin: '0 2px', backgroundColor: '#c6e48b' }}></div>
+                                 <div style={{ width: '10px', height: '10px', margin: '0 2px', backgroundColor: '#7bc96f' }}></div>
+                                 <div style={{ width: '10px', height: '10px', margin: '0 2px', backgroundColor: '#239a3b' }}></div>
+                                 <div style={{ width: '10px', height: '10px', margin: '0 2px', backgroundColor: '#196127' }}></div>
+                             </div>
+                             <span>More</span>
+                         </div>
+                     </div>
+                 </div>
+                 <p className="info-text" style={{ fontSize: '0.9rem', color: '#666', textAlign: 'center' }}>
+                     The heatmap shows days when you submitted coding challenges. Keep practicing to fill the calendar!
+                 </p>
+             </section>
+
+             {/* Assignment Marks Chart */}
             <section className="progress">
                 <div className="progress-header">
                     <h4>Assignment Marks Progress</h4>
@@ -303,21 +396,21 @@ const Dashboard = () => {
                 </ResponsiveContainer>
             </section>
 
-            {/* Certifications */}
-            <section className="certifications">
-                <h4>📜 Certifications Obtained</h4>
-                {certifications.length === 0 ? (
-                    <p>No certifications yet.</p>
-                ) : (
-                    <ul className="cert-list">
-                        {certifications.map((cert, index) => (
-                            <li key={index}>
-                                <strong>{cert.title}</strong> – <span>{formatDate(cert.time) || formatDate(cert.date)}</span>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </section>
+             {/* Certifications */}
+             <section className="certifications">
+                 <h4>📜 Certifications Obtained</h4>
+                 {certifications.length === 0 ? (
+                     <p>No certifications yet.</p>
+                 ) : (
+                     <ul className="cert-list">
+                         {certifications.map((cert, index) => (
+                             <li key={index}>
+                                 <strong>{cert.title}</strong> – <span>{formatDate(cert.time) || formatDate(cert.date)}</span>
+                             </li>
+                         ))}
+                     </ul>
+                 )}
+             </section>
         </>
     );
 
@@ -412,15 +505,19 @@ const Dashboard = () => {
     );
 
     // This function will render the MyCourses component. The commented-out code
-    // from the previous version was trying to render course cards directly, which
-    // is better handled within the dedicated MyCourses component.
-    const renderCourses = () => (
-        <MyCourses />
-    );
-
-    const renderCodingChallenge = () => (
-        <CodeChallenge />
-    );
+     // from the previous version was trying to render course cards directly, which
+     // is better handled within the dedicated MyCourses component.
+     const renderCourses = () => (
+         <MyCourses />
+     );
+     
+     const renderCodingChallenge = () => (
+         <CodeChallenge />
+     );
+     
+     const renderDailyProblem = () => (
+         <DailyProblem />
+     );
 
     return (
         <div className={`dashboard-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
@@ -466,33 +563,44 @@ const Dashboard = () => {
                             Assignments
                         </a>
                         <a
-                            href="/fresher/daily-quiz"
-                            className="daily-quiz-link"
-                            onClick={() => {
-                                if (window.innerWidth <= 768) setSidebarOpen(false);
-                            }}
-                        >
-                            <span className="nav-icon"><FaBullseye /></span>
-                            Daily Quiz
-                        </a>
-                        <a
-                            href="#"
-                            className={activeTab === 'coding-challenge' ? 'active' : ''}
-                            onClick={() => {
-                                setActiveTab('coding-challenge');
-                                if (window.innerWidth <= 768) setSidebarOpen(false);
-                            }}
-                        >
-                            <span className="nav-icon"><FaCode /></span>
-                            Coding Challenge
-                        </a>
+                             href="/fresher/daily-quiz"
+                             className="daily-quiz-link"
+                             onClick={() => {
+                                 if (window.innerWidth <= 768) setSidebarOpen(false);
+                             }}
+                         >
+                             <span className="nav-icon"><FaBullseye /></span>
+                             Daily Quiz
+                         </a>
+                         <a
+                             href="#"
+                             className={activeTab === 'daily-problem' ? 'active' : ''}
+                             onClick={() => {
+                                 setActiveTab('daily-problem');
+                                 if (window.innerWidth <= 768) setSidebarOpen(false);
+                             }}
+                         >
+                             <span className="nav-icon"><FaCode /></span>
+                             Daily Problem
+                         </a>
+                         <a
+                             href="#"
+                             className={activeTab === 'coding-challenge' ? 'active' : ''}
+                             onClick={() => {
+                                 setActiveTab('coding-challenge');
+                                 if (window.innerWidth <= 768) setSidebarOpen(false);
+                             }}
+                         >
+                             <span className="nav-icon"><FaCode /></span>
+                             Coding Challenge
+                         </a>
                     </nav>
                 </aside>
 
                 {/* Main */}
                 <main className="main-content">
                     <header className="topbar">
-                        <h2>{activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'courses' ? 'My Learning' : activeTab === 'assignments' ? 'Assignments' : activeTab === 'coding-challenge' ? 'Coding Challenge' : 'Dashboard'}</h2>
+                        <h2>{activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'courses' ? 'My Learning' : activeTab === 'assignments' ? 'Assignments' : activeTab === 'coding-challenge' ? 'Coding Challenge' : activeTab === 'daily-problem' ? 'Daily Problem' : 'Dashboard'}</h2>
                         <div className="user-dropdown" ref={dropdownRef}>
                             <span className="user-name" onClick={() => setDropdownOpen(!dropdownOpen)}>
                                 {userName} ▾
@@ -506,7 +614,12 @@ const Dashboard = () => {
                     </header>
 
                     {/* Main content rendering based on active tab */}
-                    {activeTab === 'dashboard' ? renderDashboard() : activeTab === 'courses' ? renderCourses() : activeTab === 'assignments' ? renderAssignments() : renderCodingChallenge()}
+                     {activeTab === 'dashboard' ? renderDashboard() : 
+                      activeTab === 'courses' ? renderCourses() : 
+                      activeTab === 'assignments' ? renderAssignments() : 
+                      activeTab === 'coding-challenge' ? renderCodingChallenge() :
+                      activeTab === 'daily-problem' ? renderDailyProblem() :
+                      renderDashboard()}
                 </main>
             </div>
 

@@ -41,6 +41,25 @@
 .error-message {
     color: #ef4444;
     font-weight: 500;
+    padding: 0.75rem;
+    background-color: #fee2e2;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    color: #047857;
+    font-weight: 500;
+    padding: 0.75rem;
+    background-color: #d1fae5;
+    border-radius: 6px;
+    margin-top: 1rem;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .question-container {
@@ -96,16 +115,74 @@
     gap: 1rem;
 }
 
+.evaluation-container {
+    margin-top: 2rem;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.evaluation-container h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: #374151;
+}
+
+.emoji-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.emoji {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.evaluation-text {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.6;
+    color: #4b5563;
+    width: 100%;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 6px;
+}
+
 .editor-container button {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
     font-weight: 600;
     border-radius: 6px;
     border: none;
-    background-color: #10b981;
-    color: #fff;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+
+.editor-container button:first-child {
+    background-color: #4b5563;
+    color: #fff;
+}
+
+.editor-container button:first-child:hover:not(:disabled) {
+    background-color: #374151;
+}
+
+.editor-container button:last-child {
+    background-color: #4f46e5;
+    color: #fff;
+}
+
+.editor-container button:last-child:hover:not(:disabled) {
+    background-color: #4338ca;
+}
+
+.editor-container button:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
 }
 
 .editor-container button:disabled {
