@@ -336,6 +336,21 @@ const AssessmentPage = () => {
                         status: "Completed",
                     });
                     console.log("Assessment score updated in Firestore!");
+                    
+                    // Check if score is above 65% to generate certificate
+                    if (percentageScore > 65) {
+                        // Add certificate to user's certifications collection
+                        const certificationsRef = collection(db, "users", auth.currentUser.uid, "certifications");
+                        await addDoc(certificationsRef, {
+                            title: `${assessment.courseTitle} Certificate`,
+                            courseId: assessment.courseId,
+                            courseTitle: assessment.courseTitle,
+                            score: percentageScore.toFixed(2),
+                            date: serverTimestamp(),
+                            assessmentId: assessmentId
+                        });
+                        console.log("Certificate generated and added to Firestore!");
+                    }
                 } else {
                     // Check if there's already an assignment for this course
                     const courseAssignmentQuery = query(assignmentsRef, where("courseId", "==", assessment.courseId));
@@ -351,6 +366,21 @@ const AssessmentPage = () => {
                             status: "Completed",
                         });
                         console.log("Existing assignment updated with assessment score!");
+                        
+                        // Check if score is above 65% to generate certificate
+                        if (percentageScore > 65) {
+                            // Add certificate to user's certifications collection
+                            const certificationsRef = collection(db, "users", auth.currentUser.uid, "certifications");
+                            await addDoc(certificationsRef, {
+                                title: `${assessment.courseTitle} Certificate`,
+                                courseId: assessment.courseId,
+                                courseTitle: assessment.courseTitle,
+                                score: percentageScore.toFixed(2),
+                                date: serverTimestamp(),
+                                assessmentId: assessmentId
+                            });
+                            console.log("Certificate generated and added to Firestore!");
+                        }
                     } else {
                         // Assignment does not exist, add a new one
                         await addDoc(assignmentsRef, {
@@ -362,6 +392,21 @@ const AssessmentPage = () => {
                             status: "Completed",
                         });
                         console.log("New assessment score saved to Firestore!");
+                        
+                        // Check if score is above 65% to generate certificate
+                        if (percentageScore > 65) {
+                            // Add certificate to user's certifications collection
+                            const certificationsRef = collection(db, "users", auth.currentUser.uid, "certifications");
+                            await addDoc(certificationsRef, {
+                                title: `${assessment.courseTitle} Certificate`,
+                                courseId: assessment.courseId,
+                                courseTitle: assessment.courseTitle,
+                                score: percentageScore.toFixed(2),
+                                date: serverTimestamp(),
+                                assessmentId: assessmentId
+                            });
+                            console.log("Certificate generated and added to Firestore!");
+                        }
                     }
                 }
             } catch (e) {
@@ -390,7 +435,8 @@ Great job on taking this step in your learning journey!`;
             percentageScore: percentageScore.toFixed(2),
             correctAnswers,
             wrongAnswers,
-            totalQuestions
+            totalQuestions,
+            certificateEarned: percentageScore > 65
         });
         
         try {
@@ -530,6 +576,12 @@ Great job on taking this step in your learning journey!`;
                                 <p className="wrong-answers">Wrong Answers: <span className="highlight">{assessmentSummary.wrongAnswers}</span></p>
                                 <p className="total-questions">Total Questions: <span className="highlight">{assessmentSummary.totalQuestions}</span></p>
                             </div>
+                            {assessmentSummary.certificateEarned && (
+                                <div className="certificate-earned">
+                                    <p>🏆 Congratulations! You've earned a certificate for this assessment!</p>
+                                    <p>View it in your dashboard under Certifications.</p>
+                                </div>
+                            )}
                         </div>
                         <div className="summary-actions">
                             <button onClick={() => {
@@ -544,7 +596,7 @@ Great job on taking this step in your learning journey!`;
             {showFeedbackModal && (
                 <div className="feedback-modal-overlay">
                     <div className="feedback-modal-content">
-                        <h3>Gemini Feedback</h3>
+                        <h3>Hexabot Feedback</h3>
                         <p>{geminiFeedback}</p>
                         <button onClick={() => {
                             setShowFeedbackModal(false);

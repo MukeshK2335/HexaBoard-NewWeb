@@ -497,6 +497,34 @@ body {
     font-weight: 500;
 }
 
+/* Certificate Card */
+.certificate-card {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.certificate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
+}
+
+.certificate-card h4 {
+    color: white;
+}
+
+.certificate-icon {
+    font-size: 32px;
+    margin: 10px 0;
+    color: white;
+}
+
+.certificate-card .info {
+    color: white;
+    font-weight: 500;
+}
+
 /* Progress */
 .progress {
     background: white;
@@ -546,14 +574,57 @@ body {
 }
 
 .cert-list li {
-    padding: 14px 0;
+    padding: 16px;
     border-bottom: 1px solid #e5e7eb;
     font-size: 16px;
     color: #1f2937;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+}
+
+.cert-list li:hover {
+    background-color: #f9fafb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .cert-list li:last-child {
     border-bottom: none;
+}
+
+.cert-icon {
+    font-size: 24px;
+    margin-right: 16px;
+    background-color: #4f46e5;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cert-details {
+    flex: 1;
+}
+
+.cert-meta {
+    display: flex;
+    margin-top: 6px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.cert-date {
+    margin-right: 16px;
+}
+
+.cert-score {
+    font-weight: 600;
+    color: #4f46e5;
 }
 
 /* Coding Challenge Heatmap */

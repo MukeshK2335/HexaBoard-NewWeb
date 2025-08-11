@@ -313,16 +313,9 @@ const Dashboard = () => {
                     <h4>Completed Courses</h4>
                     <p className="count">{data.completedCourses}</p>
                 </div>
-                <div className="card daily-quiz-card" onClick={() => navigate('/fresher/daily-quiz')}>
-                    <h4>Daily Quiz</h4>
-                    <p className="quiz-icon">🎯</p>
-                    <span className="info">Test your knowledge daily!</span>
-                </div>
-                <div className="card daily-problem-card" onClick={() => setActiveTab('daily-problem')}>
-                    <h4>Daily Problem</h4>
-                    <p className="problem-icon">💻</p>
-                    <span className="info">Streak: {problemStreak} days</span>
-                </div>
+                
+                
+                
             </section>
 
           
@@ -398,14 +391,21 @@ const Dashboard = () => {
 
              {/* Certifications */}
              <section className="certifications">
-                 <h4>📜 Certifications Obtained</h4>
+                 <h4>🏆 Certifications Obtained</h4>
                  {certifications.length === 0 ? (
-                     <p>No certifications yet.</p>
+                     <p>No certifications yet. Complete assignments with a score above 65% to earn certificates!</p>
                  ) : (
                      <ul className="cert-list">
                          {certifications.map((cert, index) => (
-                             <li key={index}>
-                                 <strong>{cert.title}</strong> – <span>{formatDate(cert.time) || formatDate(cert.date)}</span>
+                             <li key={index} className="cert-item">
+                                 <div className="cert-icon">🎓</div>
+                                 <div className="cert-details">
+                                     <strong>{cert.title}</strong>
+                                     <div className="cert-meta">
+                                         <span className="cert-date">{formatDate(cert.time) || formatDate(cert.date)}</span>
+                                         {cert.score && <span className="cert-score">Score: {cert.score}%</span>}
+                                     </div>
+                                 </div>
                              </li>
                          ))}
                      </ul>
@@ -629,7 +629,7 @@ const Dashboard = () => {
             {geminiFeedback && (
                 <div className="feedback-modal-overlay">
                     <div className="feedback-modal-content">
-                        <h3>Gemini Feedback</h3>
+                        <h3>Hexabot Feedback</h3>
                         <p>{geminiFeedback}</p>
                         <button onClick={() => setGeminiFeedback(null)}>Close</button>
                     </div>
