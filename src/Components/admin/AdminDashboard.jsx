@@ -28,7 +28,6 @@ const AdminDashboard = () => {
     const [selectedTab, setSelectedTab] = useState('dashboard');
     const [loginLogs, setLoginLogs] = useState([]);
     const [sidebarOpen, setSidebarOpen] = useState(false); // State for mobile sidebar visibility
-    
     const [freshersCount, setFreshersCount] = useState(0);
     const [coursesCount, setCoursesCount] = useState(0);
     const [submissionsCount, setSubmissionsCount] = useState(0);
@@ -346,7 +345,7 @@ const handleAddFresher = async (fresher) => {
                             </div>
                         </header>
                         <section className="dashboard-metrics">
-                            <div className="card blue">FRESHERS JOINED <span>{freshersCount}</span></div>
+                            <div className="card blue" onClick={() => navigate('/admin/all-freshers')}>FRESHERS JOINED <span>{freshersCount}</span></div>
                             <div className="card green">COURSES UPLOADED <span>{coursesCount}</span></div>
                             <div className="card orange">SUBMISSIONS <span>{submissionsCount}</span></div>
                             <div className="card teal">ACTIVE USERS <span>{activeUsersCount}</span></div>

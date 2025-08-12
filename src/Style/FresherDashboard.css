@@ -634,6 +634,7 @@ body {
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    overflow-x: auto;
 }
 
 /* Calendar Heatmap Custom Styles */
@@ -659,7 +660,7 @@ body {
 
 /* Make sure the heatmap is responsive */
 .react-calendar-heatmap {
-    width: 100%;
+    max-width: 100%;
     height: auto;
 }
 
@@ -735,6 +736,13 @@ body {
         width: auto;
     }
 }
+
+
+.react-calendar-heatmap {
+    max-width: 190%;
+    height: auto;
+}
+
 
 /* Course Header Section */
 .course-header-section {

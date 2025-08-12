@@ -12,6 +12,7 @@ import MyCourses from './Components/fresher/MyCourses.jsx';
 import AssessmentPage from './Components/assessments/AssessmentPage.jsx';
 import DailyQuiz from './Components/fresher/DailyQuiz.jsx';
 import CodeChallenge from './Components/fresher/CodeChallenge.jsx';
+import AllFreshers from './Components/admin/AllFreshers.jsx';
 import './App.css';
 
 function App() {
@@ -35,6 +36,13 @@ function App() {
                 <Route path="/admin" element={
                     <ProtectedRoute>
                         <AdminDashboard />
+                    </ProtectedRoute>
+                } />
+
+                {/* ✅ All Freshers Page (Protected) */}
+                <Route path="/admin/all-freshers" element={
+                    <ProtectedRoute>
+                        <AllFreshers />
                     </ProtectedRoute>
                 } />
 

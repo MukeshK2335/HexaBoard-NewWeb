@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, X, Bot, User, Loader2 } from 'lucide-react';
 import { db, auth } from '../../firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, limit, onSnapshot, getDocs, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { generateContextualResponse } from '../../services/chatbotService';
+import { chatbotService } from '../../services/chatbotService';
 import '../../Style/Chatbot.css';
 
 const Chatbot = () => {
@@ -11,12 +11,14 @@ const Chatbot = () => {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
     const [user, setUser] = useState(null);
-    const [userName, setUserName] = useState('');
+    const [userName, setUserName] = useState('Fresher');
+    const [userData, setUserData] = useState(null);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
 
-    // Predefined responses for common questions
+    // Predefined responses for common queries - these are fallbacks if the AI service fails
     const predefinedResponses = {
         'course': {
             keywords: ['course', 'lesson', 'module', 'learning', 'study', 'progress'],
@@ -41,6 +43,18 @@ const Chatbot = () => {
         'general': {
             keywords: ['hello', 'hi', 'help', 'what can you do'],
             response: "Hello! I'm your learning assistant. I can help you with:\n• Course information and progress\n• Assignment questions\n• Technical support\n• Learning tips and guidance\n\nWhat would you like to know?"
+        },
+        'greeting': {
+            keywords: ['hey', 'greetings'],
+            response: 'Hello! I am HexaBot, your learning assistant. How can I help you today?'
+        },
+        'help': {
+            keywords: ['assist', 'support', 'guidance'],
+            response: 'I can help you with course information, assignments, technical issues, and learning resources. What do you need assistance with?'
+        },
+        'about': {
+            keywords: ['about', 'who are you', 'what are you', 'what can you do'],
+            response: 'I am HexaBot, an AI assistant designed to help freshers at HexaBoard. I can answer questions about your courses, assignments, and provide learning resources.'
         }
     };
 
@@ -48,14 +62,32 @@ const Chatbot = () => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUser(user);
-                // Clear previous chat history when user logs in
-                setMessages([]);
-                // Do NOT load chat history here if the intent is to clear it on login.
-                // Chat history will still be saved to Firebase, but not displayed on login.
+                // Load user data to get name and for personalized responses
+                const getUserData = async () => {
+                    try {
+                        const userDoc = await getDoc(doc(db, 'users', user.uid));
+                        if (userDoc.exists()) {
+                            const userData = userDoc.data();
+                            setUserName(userData.name || 'Fresher');
+                            // Store complete user data for personalized responses
+                            setUserData(userData);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching user data:', error);
+                    }
+                };
+                getUserData();
+                
+                // Load chat history
+                const unsubscribeChat = loadChatHistory(user.uid);
+                return () => {
+                    if (unsubscribeChat) unsubscribeChat();
+                };
             } else {
                 // Clear messages if user logs out
                 setMessages([]);
                 setUser(null);
+                setUserName('');
             }
         });
 
@@ -92,11 +124,29 @@ const Chatbot = () => {
     const getResponseType = (message) => {
         const lowerMessage = message.toLowerCase();
         
-        for (const [type, config] of Object.entries(predefinedResponses)) {
-            if (config.keywords.some(keyword => lowerMessage.includes(keyword))) {
-                return type;
+        // Define categories and their keywords for better classification
+        const categories = {
+            'course': ['course', 'lesson', 'module', 'learning', 'study', 'progress', 'enrolled', 'class', 'content', 'material', 'lecture', 'video'],
+            'assignment': ['assignment', 'homework', 'task', 'due', 'deadline', 'submit', 'complete', 'finish', 'pending', 'assessment', 'quiz', 'test'],
+            'progress': ['progress', 'completion', 'percentage', 'how much', 'done', 'finished', 'completed', 'status', 'track', 'performance', 'score', 'grade'],
+            'certificate': ['certificate', 'certification', 'completion', 'award', 'achievement', 'credential', 'diploma', 'recognition'],
+            'technical': ['error', 'bug', 'problem', 'issue', 'not working', 'broken', 'fix', 'help', 'support', 'trouble', 'difficulty', 'can\'t access'],
+            'general': ['hello', 'hi', 'help', 'what can you do', 'who are you', 'about', 'info', 'information']
+        };
+        
+        // Check for specific course names or assignment titles in the message
+        // This will be used to provide more specific responses
+        if (user) {
+            // We'll handle this in the generateResponse function
+        }
+        
+        // Determine the category based on keywords
+        for (const [category, keywords] of Object.entries(categories)) {
+            if (keywords.some(keyword => lowerMessage.includes(keyword))) {
+                return category;
             }
         }
+        
         return 'general';
     };
 
@@ -104,8 +154,59 @@ const Chatbot = () => {
         if (!user) return predefinedResponses.general.response;
         
         try {
-            // Use the chatbot service for contextual responses
-            const contextualResponse = await generateContextualResponse(user.uid, userMessage);
+            // Get the response type to provide more context to the AI
+            const responseType = getResponseType(userMessage);
+            
+            // Check if the message contains specific course or assignment names
+            let specificEntityInfo = null;
+            
+            if (responseType === 'course' || responseType === 'assignment') {
+                try {
+                    // Fetch user's courses and assignments to check for specific mentions
+                    const coursesRef = collection(db, 'users', user.uid, 'courses');
+                    const coursesSnapshot = await getDocs(coursesRef);
+                    const courses = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    const assignmentsRef = collection(db, 'users', user.uid, 'assignments');
+                    const assignmentsSnapshot = await getDocs(assignmentsRef);
+                    const assignments = assignmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    // Check if the message contains any course titles
+                    for (const course of courses) {
+                        if (course.title && userMessage.toLowerCase().includes(course.title.toLowerCase())) {
+                            specificEntityInfo = {
+                                type: 'course',
+                                data: course
+                            };
+                            break;
+                        }
+                    }
+                    
+                    // If no course was found, check for assignment titles
+                    if (!specificEntityInfo) {
+                        for (const assignment of assignments) {
+                            if (assignment.title && userMessage.toLowerCase().includes(assignment.title.toLowerCase())) {
+                                specificEntityInfo = {
+                                    type: 'assignment',
+                                    data: assignment
+                                };
+                                break;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking for specific entities:', error);
+                }
+            }
+            
+            // Add the specific entity info to the user message if found
+            let enhancedMessage = userMessage;
+            if (specificEntityInfo) {
+                enhancedMessage = `[Regarding ${specificEntityInfo.type}: ${specificEntityInfo.data.title}] ${userMessage}`;
+            }
+            
+            // Use the chatbot service for contextual responses with the enhanced message
+            const contextualResponse = await chatbotService.generateContextualResponse(user.uid, enhancedMessage);
             return contextualResponse;
         } catch (error) {
             console.error('Error generating contextual response:', error);
@@ -146,6 +247,7 @@ const Chatbot = () => {
 
         // Simulate typing delay
         setTimeout(async () => {
+            // Generate response with user context and data
             const botResponse = await generateResponse(userMessage);
             
             const botMsg = {
@@ -165,6 +267,22 @@ const Chatbot = () => {
                     timestamp: serverTimestamp(),
                     userName: 'HexaBot'
                 });
+                
+                // If the message is about a course or assignment, fetch updated data
+                const messageType = getResponseType(userMessage);
+                if (messageType === 'course' || messageType === 'assignment' || messageType === 'progress') {
+                    // Refresh user data to get the latest information
+                    try {
+                        const userDocRef = doc(db, 'users', user.uid);
+                        const userDoc = await getDoc(userDocRef);
+                        
+                        if (userDoc.exists()) {
+                            setUserData(userDoc.data());
+                        }
+                    } catch (error) {
+                        console.error('Error refreshing user data:', error);
+                    }
+                }
             } catch (error) {
                 console.error('Error saving bot message:', error);
             }
@@ -308,4 +426,4 @@ const Chatbot = () => {
     );
 };
 
-export default Chatbot; 
+export default Chatbot;

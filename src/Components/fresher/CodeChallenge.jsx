@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { generateCodingChallenge, evaluateCode } from '../../services/chatbotService';
 import { db, auth } from "../../firebase";
 import { doc, setDoc, collection, getDoc } from "firebase/firestore";
@@ -218,7 +219,7 @@ const CodeChallenge = () => {
             {question && (
                 <div className="question-container">
                     <h2>Problem:</h2>
-                    <pre>{question}</pre>
+                    <ReactMarkdown>{question}</ReactMarkdown>
                 </div>
             )}
             <div className="editor-container">

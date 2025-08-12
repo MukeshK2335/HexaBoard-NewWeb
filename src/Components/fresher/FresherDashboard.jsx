@@ -136,16 +136,23 @@ const Dashboard = () => {
             setError(null);
 
             if (user) {
+                const userRef = doc(db, 'users', user.uid);
                 // Fetch coding challenge submissions and daily problem data
                 try {
-                     const challengesRef = collection(db, "users", user.uid, "codingChallenges");
-                     const challengesSnap = await getDocs(challengesRef);
-                     const challengeData = challengesSnap.docs.map(doc => ({
-                         id: doc.id,
-                         ...doc.data(),
-                         date: doc.data().timestamp?.toDate().toISOString().split('T')[0] || new Date().toISOString().split('T')[0]
-                     }));
-                     setCodingChallengeData(challengeData);
+                     const today = new Date();
+                    const fakeData = [];
+                    for (let i = 0; i < 180; i++) {
+                        const date = new Date(today);
+                        date.setDate(today.getDate() - i);
+                        if (Math.random() > 0.4) {
+                            fakeData.push({
+                                date: date.toISOString().split('T')[0],
+                                count: Math.floor(Math.random() * 4) + 1,
+                                question: `Fake Challenge ${i}`
+                            });
+                        }
+                    }
+                    setCodingChallengeData(fakeData);
                      
                      // Fetch daily problem data
                      const problemsRef = collection(db, "users", user.uid, "dailyProblems");
@@ -158,6 +165,7 @@ const Dashboard = () => {
                      setDailyProblemData(problemData);
                      
                      // Get user streak data
+                     const userRef = doc(db, "users", user.uid);
                      const userDoc = await getDoc(userRef);
                      if (userDoc.exists()) {
                          const userData = userDoc.data();
@@ -168,7 +176,6 @@ const Dashboard = () => {
                  }
                 try {
                     // Update login time when user logs in
-                    const userRef = doc(db, "users", user.uid);
                     
                     // First check if the user document exists and has loginActivity structure
                     const userDoc = await getDoc(userRef);
