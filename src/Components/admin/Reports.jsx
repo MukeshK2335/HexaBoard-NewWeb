@@ -9,6 +9,9 @@ const Reports = () => {
     const [freshers, setFreshers] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const [selectedDepartment, setSelectedDepartment] = useState('');
+    const [departments, setDepartments] = useState([]);
+
     // Fetch all freshers for individual selection
     useEffect(() => {
         const fetchFreshers = async () => {
@@ -25,12 +28,36 @@ const Reports = () => {
             }
         };
 
+        const fetchDepartments = async () => {
+            try {
+                const usersRef = collection(db, 'users');
+                const querySnapshot = await getDocs(usersRef);
+                console.log('Total user documents fetched:', querySnapshot.docs.length);
+                const uniqueDepartments = new Set();
+                querySnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    console.log('User ID:', doc.id, 'Department:', data.department);
+                    if (data.department) {
+                        uniqueDepartments.add(data.department);
+                    } else {
+                        uniqueDepartments.add('N/A'); // Add N/A for users without a department
+                    }
+                });
+                console.log('Unique departments identified:', Array.from(uniqueDepartments));
+                setDepartments(Array.from(uniqueDepartments));
+            } catch (error) {
+                console.error('Error fetching departments:', error);
+            }
+        };
+
         fetchFreshers();
+        fetchDepartments();
     }, []);
 
     const handleReportTypeChange = (e) => {
         setReportType(e.target.value);
         setSelectedFresher('');
+        setSelectedDepartment(''); // Clear selected department when report type changes
     };
 
     const handleFresherChange = (e) => {
@@ -43,7 +70,19 @@ const Reports = () => {
             if (reportType === 'individual' && selectedFresher) {
                 await downloadIndividualFresherAssignmentMarks(selectedFresher);
             } else if (reportType === 'department') {
-                await downloadDepartmentWiseFresherAssignmentMarks();
+                await downloadDepartmentWiseFresherAssignmentMarks(selectedDepartment); // Pass selectedDepartment
+            } else if (reportType === 'dailyProblemProgress') {
+                if (selectedFresher) {
+                    await downloadIndividualFresherDailyProblemProgress(selectedFresher);
+                } else {
+                    await downloadDepartmentWiseFresherDailyProblemProgress();
+                }
+            } else if (reportType === 'codingChallengeProgress') {
+                if (selectedFresher) {
+                    await downloadIndividualFresherCodingChallengeProgress(selectedFresher);
+                } else {
+                    await downloadDepartmentWiseFresherCodingChallengeProgress();
+                }
             }
         } catch (error) {
             console.error('Error downloading report:', error);
@@ -53,14 +92,16 @@ const Reports = () => {
         }
     };
 
-    const downloadDepartmentWiseFresherAssignmentMarks = async () => {
+    const downloadDepartmentWiseFresherAssignmentMarks = async (departmentFilter) => {
         try {
-            // Get all freshers
-            const freshersQuery = query(collection(db, 'users'), where('role', '==', 'fresher'));
+            let freshersQuery = query(collection(db, 'users'), where('role', '==', 'fresher'));
+            if (departmentFilter) {
+                freshersQuery = query(freshersQuery, where('department', '==', departmentFilter));
+            }
             const freshersSnapshot = await getDocs(freshersQuery);
             
             if (freshersSnapshot.empty) {
-                alert('No freshers found.');
+                alert('No freshers found for the selected department.');
                 return;
             }
             
@@ -98,7 +139,7 @@ const Reports = () => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `Department_Wise_Fresher_Assignments.csv`);
+            link.setAttribute('download', `Department_Wise_Fresher_Assignments${departmentFilter ? `_${departmentFilter}` : ''}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -163,6 +204,182 @@ const Reports = () => {
         }
     };
 
+    const downloadIndividualFresherDailyProblemProgress = async (fresherId) => {
+        try {
+            const fresherDoc = await getDoc(doc(db, 'users', fresherId));
+            if (!fresherDoc.exists()) {
+                throw new Error('Fresher not found');
+            }
+            const fresherData = fresherDoc.data();
+            const fresherName = fresherData.name || fresherData.email || 'Unknown';
+
+            const dailyProblemsQuery = query(collection(db, 'users', fresherId, 'dailyProblems'));
+            const dailyProblemsSnapshot = await getDocs(dailyProblemsQuery);
+
+            if (dailyProblemsSnapshot.empty) {
+                alert(`No daily problem submissions found for ${fresherName}.`);
+                return;
+            }
+
+            let csvContent = 'Problem Date,Question,Code Submitted\n';
+            dailyProblemsSnapshot.docs.forEach(problemDoc => {
+                const problem = problemDoc.data();
+                const date = problem.date || (problem.timestamp ? new Date(problem.timestamp.toDate()).toLocaleDateString() : 'N/A');
+                const question = problem.question ? `"${problem.question.replace(/"/g, '""')}"` : 'N/A'; // Handle commas and quotes
+                const code = problem.code ? `"${problem.code.replace(/"/g, '""')}"` : 'N/A'; // Handle commas and quotes
+                csvContent += `"${date}",${question},${code}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${fresherName}_Daily_Problem_Progress.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (error) {
+            console.error('Error downloading individual daily problem report:', error);
+            throw error;
+        }
+    };
+
+    const downloadDepartmentWiseFresherDailyProblemProgress = async () => {
+        try {
+            const freshersQuery = query(collection(db, 'users'), where('role', '==', 'fresher'));
+            const freshersSnapshot = await getDocs(freshersQuery);
+
+            if (freshersSnapshot.empty) {
+                alert('No freshers found.');
+                return;
+            }
+
+            let csvContent = 'Fresher Name,Department,Problem Date,Question,Code Submitted\n';
+
+            for (const fresherDoc of freshersSnapshot.docs) {
+                const fresherId = fresherDoc.id;
+                const fresherData = fresherDoc.data();
+                const fresherName = fresherData.name || fresherData.email || 'Unknown';
+                const department = fresherData.department || 'N/A';
+
+                const dailyProblemsQuery = query(collection(db, 'users', fresherId, 'dailyProblems'));
+                const dailyProblemsSnapshot = await getDocs(dailyProblemsQuery);
+
+                if (!dailyProblemsSnapshot.empty) {
+                    dailyProblemsSnapshot.docs.forEach(problemDoc => {
+                        const problem = problemDoc.data();
+                        const date = problem.date || (problem.timestamp ? new Date(problem.timestamp.toDate()).toLocaleDateString() : 'N/A');
+                        const question = problem.question ? `"${problem.question.replace(/"/g, '""')}"` : 'N/A';
+                        const code = problem.code ? `"${problem.code.replace(/"/g, '""')}"` : 'N/A';
+                        csvContent += `"${fresherName}","${department}","${date}",${question},${code}\n`;
+                    });
+                }
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Department_Wise_Daily_Problem_Progress.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (error) {
+            console.error('Error downloading department-wise daily problem report:', error);
+            throw error;
+        }
+    };
+
+    const downloadIndividualFresherCodingChallengeProgress = async (fresherId) => {
+        try {
+            const fresherDoc = await getDoc(doc(db, 'users', fresherId));
+            if (!fresherDoc.exists()) {
+                throw new Error('Fresher not found');
+            }
+            const fresherData = fresherDoc.data();
+            const fresherName = fresherData.name || fresherData.email || 'Unknown';
+
+            const codingChallengesQuery = query(collection(db, 'users', fresherId, 'codingChallenges')); // Assuming 'codingChallenges' subcollection
+            const codingChallengesSnapshot = await getDocs(codingChallengesQuery);
+
+            if (codingChallengesSnapshot.empty) {
+                alert(`No coding challenge submissions found for ${fresherName}.`);
+                return;
+            }
+
+            let csvContent = 'Challenge Date,Question,Code Submitted\n';
+            codingChallengesSnapshot.docs.forEach(challengeDoc => {
+                const challenge = challengeDoc.data();
+                const date = challenge.date || (challenge.timestamp ? new Date(challenge.timestamp.toDate()).toLocaleDateString() : 'N/A');
+                const question = challenge.question ? `"${challenge.question.replace(/"/g, '""')}"` : 'N/A';
+                const code = challenge.code ? `"${challenge.code.replace(/"/g, '""')}"` : 'N/A';
+                csvContent += `"${date}",${question},${code}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${fresherName}_Coding_Challenge_Progress.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (error) {
+            console.error('Error downloading individual coding challenge report:', error);
+            throw error;
+        }
+    };
+
+    const downloadDepartmentWiseFresherCodingChallengeProgress = async () => {
+        try {
+            const freshersQuery = query(collection(db, 'users'), where('role', '==', 'fresher'));
+            const freshersSnapshot = await getDocs(freshersQuery);
+
+            if (freshersSnapshot.empty) {
+                alert('No freshers found.');
+                return;
+            }
+
+            let csvContent = 'Fresher Name,Department,Challenge Date,Question,Code Submitted\n';
+
+            for (const fresherDoc of freshersSnapshot.docs) {
+                const fresherId = fresherDoc.id;
+                const fresherData = fresherDoc.data();
+                const fresherName = fresherData.name || fresherData.email || 'Unknown';
+                const department = fresherData.department || 'N/A';
+
+                const codingChallengesQuery = query(collection(db, 'users', fresherId, 'codingChallenges'));
+                const codingChallengesSnapshot = await getDocs(codingChallengesQuery);
+
+                if (!codingChallengesSnapshot.empty) {
+                    codingChallengesSnapshot.docs.forEach(challengeDoc => {
+                        const challenge = challengeDoc.data();
+                        const date = challenge.date || (challenge.timestamp ? new Date(challenge.timestamp.toDate()).toLocaleDateString() : 'N/A');
+                        const question = challenge.question ? `"${challenge.question.replace(/"/g, '""')}"` : 'N/A';
+                        const code = challenge.code ? `"${challenge.code.replace(/"/g, '""')}"` : 'N/A';
+                        csvContent += `"${fresherName}","${department}","${date}",${question},${code}\n`;
+                    });
+                }
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Department_Wise_Coding_Challenge_Progress.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (error) {
+            console.error('Error downloading department-wise coding challenge report:', error);
+            throw error;
+        }
+    };
+
     return (
         <div className="report-section">
             <h2 className="report-title">Generate Reports</h2>
@@ -172,10 +389,27 @@ const Reports = () => {
                     value={reportType}
                     onChange={handleReportTypeChange}
                 >
-                    <option value="department">Department-wise</option>
-                    <option value="individual">Individual</option>
+                    <option value="department">Department-wise Assignment Marks</option>
+                    <option value="individual">Individual Assignment Marks</option>
+                    <option value="dailyProblemProgress">Daily Problem Progress</option>
+                    <option value="codingChallengeProgress">Coding Challenge Progress</option>
                 </select>
                 
+                {reportType === 'department' && (
+                    <select 
+                        className="report-dropdown department-select"
+                        value={selectedDepartment}
+                        onChange={(e) => setSelectedDepartment(e.target.value)}
+                    >
+                        <option value="">All Departments</option>
+                        {departments.map(dept => (
+                            <option key={dept} value={dept}>
+                                {dept}
+                            </option>
+                        ))}
+                    </select>
+                )}
+
                 {reportType === 'individual' && (
                     <select 
                         className="report-dropdown fresher-select"
