@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { generateCodingChallenge, evaluateCode } from '../../services/chatbotService';
 import { db, auth } from "../../firebase";
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
@@ -14,7 +15,6 @@ const DailyProblem = () => {
     const [userId, setUserId] = useState(null);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [streakCount, setStreakCount] = useState(0);
-    const [lastProblemDate, setLastProblemDate] = useState(null);
     const [problemAvailable, setProblemAvailable] = useState(true);
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -40,7 +40,6 @@ const DailyProblem = () => {
                     const streak = userData.problemStreak || 0;
                     
                     setStreakCount(streak);
-                    setLastProblemDate(lastProblem);
                     
                     if (lastProblem) {
                         const today = new Date();
@@ -56,8 +55,8 @@ const DailyProblem = () => {
 
                 // Generate a new daily problem
                 await generateDailyProblem();
-            } catch (err) {
-                console.error("Error checking problem availability:", err);
+            } catch (error) {
+                console.error("Error checking problem availability:", error);
                 setError("Failed to check problem availability. Please try again.");
             } finally {
                 setLoading(false);
@@ -142,17 +141,17 @@ const DailyProblem = () => {
                             // If the last problem was solved today (shouldn't happen), keep the streak
                             newStreak = userData.problemStreak || 1;
                         }
-                    } else {
-                        // Already solved today, maintain current streak
-                        newStreak = userData.problemStreak || 1;
-                        setSuccessMessage('You already solved today\'s problem!');
-                        setSaveSuccess(true);
-                        setTimeout(() => {
-                            setSaveSuccess(false);
-                            setSuccessMessage('');
-                        }, 3000);
-                        return;
                     }
+                } else {
+                    // Already solved today, maintain current streak
+                    newStreak = userData.problemStreak || 1;
+                    setSuccessMessage('You already solved today\'s problem!');
+                    setSaveSuccess(true);
+                    setTimeout(() => {
+                        setSaveSuccess(false);
+                        setSuccessMessage('');
+                    }, 3000);
+                    return;
                 }
             }
             
@@ -221,7 +220,7 @@ const DailyProblem = () => {
                     {question && (
                         <div className="question-container">
                             <h3>Today's Problem:</h3>
-                            <pre>{question}</pre>
+                            <ReactMarkdown>{question}</ReactMarkdown>
                         </div>
                     )}
                     <div className="editor-container">

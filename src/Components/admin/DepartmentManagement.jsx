@@ -21,7 +21,7 @@ const DepartmentManagement = () => {
         const departmentsRef = collection(db, "departments");
         const q = query(departmentsRef, where("name", "==", departmentName), limit(1));
         const snapshot = await getDocs(q);
-
+        
         if (!snapshot.empty) {
             const departmentDoc = snapshot.docs[0];
             return { id: departmentDoc.id, ...departmentDoc.data() };

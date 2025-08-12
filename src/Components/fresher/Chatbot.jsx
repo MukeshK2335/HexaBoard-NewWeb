@@ -194,6 +194,7 @@ const Chatbot = () => {
                             }
                         }
                     }
+                    
                 } catch (error) {
                     console.error('Error checking for specific entities:', error);
                 }
