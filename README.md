@@ -1,12 +1,15 @@
-# React + Vite
+<h1>Landing Page</h1>
+<img width="1918" height="912" alt="image" src="https://github.com/user-attachments/assets/c39e8eee-875c-4c1f-93af-82c2e83ddee3" />
+<h1>Role Based Login System</h1>
+<img width="1915" height="911" alt="image" src="https://github.com/user-attachments/assets/d91d39e0-018a-4237-bf34-521f2e57452b" />
+<h1>Fresher's Dashboard</h1>
+<img width="1917" height="914" alt="image" src="https://github.com/user-attachments/assets/ae056954-6033-4d0a-85bc-ee1ea41bdd28" />
+<h1>Admin's Dashboard</h1>
+<img width="1911" height="910" alt="image" src="https://github.com/user-attachments/assets/aae7edd8-160d-4a18-b14d-4a807db77733" />
+<h1>More Info</h1>
+<p>Fresher Login ID:kmukeshkumar2335@gmail.com<br>
+  Fresher Login Password:Mukesh@82328<br>
+  Admin Login Id:admin@hexaware.com<br>
+  Admin Login Password:admin@123
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
